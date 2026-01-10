@@ -1,0 +1,13 @@
+pynput
+sounddevice
+openai
+rumps
+pyobjc
+numpy
+scipy
+soundfile
+py2app
+faster-whisper
+pyperclip
+requests
+
