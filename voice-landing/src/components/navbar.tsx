@@ -20,7 +20,7 @@ const AppleIcon = () => (
 const menuItems = [
   { label: "Home", href: "/" },
   { label: "Try Voice AI", href: "/voice" },
-  { label: "Download", href: "https://github.com/Humiris/codiris-voice/releases/latest" },
+  { label: "Download", href: "https://github.com/Humiris/codiris-voice/releases/latest/download/Codiris-Voice.dmg" },
 ];
 
 export const Navbar = () => {
@@ -129,13 +129,13 @@ export const Navbar = () => {
               </div>
             </button>
 
-            <Link href="https://github.com/Humiris/codiris-voice/releases/latest">
+            <a href="https://github.com/Humiris/codiris-voice/releases/latest/download/Codiris-Voice.dmg">
               <Button
                 className="hidden sm:flex rounded-full px-7 py-6 font-bold transition-all duration-500 active:scale-95 bg-white hover:bg-slate-50 text-slate-900 border-2 border-slate-200 hover:border-blue-300 hover:shadow-lg"
               >
                 Download
               </Button>
-            </Link>
+            </a>
 
             <Link href="/voice">
               <Button
