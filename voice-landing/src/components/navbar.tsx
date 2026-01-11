@@ -93,7 +93,7 @@ export const Navbar = () => {
               <span className="text-2xl font-black tracking-tighter text-slate-900">
                 Codiris
               </span>
-              <span className="text-[10px] font-bold text-blue-500/60 uppercase tracking-[0.2em]">Intelligence</span>
+              <span className="text-[10px] font-bold text-blue-500/60 uppercase tracking-[0.2em]">Voice</span>
             </div>
           </Link>
 
