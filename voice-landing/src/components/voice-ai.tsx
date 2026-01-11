@@ -15,7 +15,10 @@ import {
   Check,
   ArrowRight,
   Volume2,
-  ArrowRightLeft
+  ArrowRightLeft,
+  RefreshCw,
+  Edit3,
+  X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -39,6 +42,13 @@ export function VoiceAI() {
   const [volume, setVolume] = useState<number[]>(Array(30).fill(10));
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"both" | "refined">("both");
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupOriginal, setPopupOriginal] = useState("");
+  const [popupRefined, setPopupRefined] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedText, setEditedText] = useState("");
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [refinementStyle, setRefinementStyle] = useState<"professional" | "casual" | "concise">("professional");
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -124,26 +134,21 @@ export function VoiceAI() {
       const transcribeData = await transcribeRes.json();
 
       if (transcribeData.text) {
-        setTranscript(transcribeData.text);
-
         // Now refine the text
         const refineRes = await fetch("/api/refine", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: transcribeData.text }),
+          body: JSON.stringify({ text: transcribeData.text, style: refinementStyle }),
         });
 
         const refineData = await refineRes.json();
 
         if (refineData.refinedText) {
-          setRefinedText(refineData.refinedText);
-          const newRefinement: Refinement = {
-            id: Math.random().toString(36).substring(7),
-            original: transcribeData.text,
-            refined: refineData.refinedText,
-            timestamp: new Date(),
-          };
-          setRefinements(prev => [newRefinement, ...prev]);
+          // Show popup with results
+          setPopupOriginal(transcribeData.text);
+          setPopupRefined(refineData.refinedText);
+          setEditedText(refineData.refinedText);
+          setShowPopup(true);
         }
       }
     } catch (err) {
@@ -151,6 +156,52 @@ export function VoiceAI() {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleRegenerateWithStyle = async (style: "professional" | "casual" | "concise") => {
+    setIsRegenerating(true);
+    setRefinementStyle(style);
+    try {
+      const refineRes = await fetch("/api/refine", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: popupOriginal, style }),
+      });
+
+      const refineData = await refineRes.json();
+
+      if (refineData.refinedText) {
+        setPopupRefined(refineData.refinedText);
+        setEditedText(refineData.refinedText);
+      }
+    } catch (err) {
+      console.error("Regeneration failed:", err);
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
+  const handleAccept = () => {
+    const finalText = isEditing ? editedText : popupRefined;
+    setTranscript(popupOriginal);
+    setRefinedText(finalText);
+    const newRefinement: Refinement = {
+      id: Math.random().toString(36).substring(7),
+      original: popupOriginal,
+      refined: finalText,
+      timestamp: new Date(),
+    };
+    setRefinements(prev => [newRefinement, ...prev]);
+    setShowPopup(false);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setShowPopup(false);
+    setIsEditing(false);
+    setPopupOriginal("");
+    setPopupRefined("");
+    setEditedText("");
   };
 
   const copyToClipboard = (text: string, id: string) => {
@@ -449,6 +500,155 @@ export function VoiceAI() {
           </div>
         </div>
       </main>
+
+      {/* Refinement Popup Modal */}
+      <AnimatePresence>
+        {showPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            onClick={handleCancel}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="relative w-full max-w-4xl bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="px-8 py-6 border-b border-white/10 bg-gradient-to-r from-blue-500/10 to-indigo-500/10">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                      <Sparkles className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-white">Improved Version Ready</h2>
+                      <p className="text-sm text-slate-400">Review and customize your refined text</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleCancel}
+                    className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
+                  >
+                    <X className="w-5 h-5 text-slate-400" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-8 space-y-6 max-h-[60vh] overflow-y-auto">
+                {/* Original Text */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-500">
+                    What you said
+                  </label>
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <p className="text-slate-300 leading-relaxed">{popupOriginal}</p>
+                  </div>
+                </div>
+
+                {/* Refinement Style Selector */}
+                <div className="space-y-3">
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-500">
+                    Refinement Style
+                  </label>
+                  <div className="flex gap-2">
+                    {[
+                      { value: "professional", label: "Professional", desc: "Formal and clear" },
+                      { value: "casual", label: "Casual", desc: "Friendly tone" },
+                      { value: "concise", label: "Concise", desc: "Brief and direct" }
+                    ].map((style) => (
+                      <button
+                        key={style.value}
+                        onClick={() => handleRegenerateWithStyle(style.value as any)}
+                        disabled={isRegenerating}
+                        className={cn(
+                          "flex-1 px-4 py-3 rounded-xl border transition-all text-left",
+                          refinementStyle === style.value
+                            ? "bg-blue-500/20 border-blue-500/50 text-blue-400"
+                            : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:border-white/20",
+                          isRegenerating && "opacity-50 cursor-not-allowed"
+                        )}
+                      >
+                        <div className="font-semibold text-sm">{style.label}</div>
+                        <div className="text-xs opacity-70">{style.desc}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Improved Text */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold uppercase tracking-widest text-blue-400 flex items-center gap-2">
+                      <Sparkles className="w-3 h-3" />
+                      Improved Version
+                    </label>
+                    <button
+                      onClick={() => setIsEditing(!isEditing)}
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-sm text-slate-400 transition-colors"
+                    >
+                      <Edit3 className="w-3 h-3" />
+                      {isEditing ? "Stop Editing" : "Edit"}
+                    </button>
+                  </div>
+
+                  {isRegenerating ? (
+                    <div className="p-8 rounded-xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/30 flex items-center justify-center">
+                      <div className="flex items-center gap-3 text-blue-400">
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span className="font-medium">Regenerating with new style...</span>
+                      </div>
+                    </div>
+                  ) : isEditing ? (
+                    <textarea
+                      value={editedText}
+                      onChange={(e) => setEditedText(e.target.value)}
+                      className="w-full p-4 rounded-xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/30 text-white leading-relaxed font-medium resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      rows={6}
+                    />
+                  ) : (
+                    <div className="p-4 rounded-xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/30">
+                      <p className="text-white leading-relaxed font-medium">{popupRefined}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Footer Actions */}
+              <div className="px-8 py-6 border-t border-white/10 bg-slate-950/50 flex items-center justify-between gap-4">
+                <button
+                  onClick={handleCancel}
+                  className="px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 font-semibold transition-colors"
+                >
+                  Discard
+                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleRegenerateWithStyle(refinementStyle)}
+                    disabled={isRegenerating}
+                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <RefreshCw className={cn("w-4 h-4", isRegenerating && "animate-spin")} />
+                    Regenerate
+                  </button>
+                  <button
+                    onClick={handleAccept}
+                    className="flex items-center gap-2 px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-all shadow-lg shadow-blue-500/30"
+                  >
+                    Accept
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
