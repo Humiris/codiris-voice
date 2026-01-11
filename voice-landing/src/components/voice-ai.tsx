@@ -212,21 +212,12 @@ export function VoiceAI() {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 px-6 py-4 flex items-center justify-between border-b border-slate-200 bg-white">
+      <header className="relative z-10 px-6 py-6 flex items-center justify-between bg-white">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform overflow-hidden">
-            <img
-              src="https://framerusercontent.com/images/6hd2q32TCQkqeTR6lgvTAQAClWE.svg?width=375&height=375"
-              alt="Codiris"
-              className="w-7 h-7 relative z-10 brightness-0 invert"
-            />
-          </div>
-          <span className="font-bold text-xl tracking-tight text-slate-900">
+          <span className="font-bold text-2xl tracking-tight text-slate-900">
             Codiris Voice
           </span>
         </Link>
-
-        {/* Right side header elements removed as requested */}
       </header>
 
       {/* Main Content */}
@@ -553,8 +544,8 @@ export function VoiceAI() {
         </div>
 
         {/* Right Side: History Sidebar */}
-        <div className="hidden lg:flex flex-col w-96 bg-slate-50 border-l-2 border-slate-200">
-          <div className="p-6 border-b-2 border-slate-200 flex items-center justify-between">
+        <div className="hidden lg:flex flex-col w-96 bg-slate-50">
+          <div className="p-6 flex items-center justify-between">
             <div className="flex items-center gap-2 font-semibold text-slate-900">
               <History className="w-4 h-4" />
               Recent Sessions
@@ -599,7 +590,7 @@ export function VoiceAI() {
                         </span>
                         <p className="text-sm text-slate-900 line-clamp-2 font-medium">{ref.refined}</p>
                       </div>
-                      <div className="pt-2 border-t border-slate-200">
+                      <div className="pt-2">
                         <span className="text-[9px] text-slate-500 uppercase tracking-wider font-bold mb-1 block">Original</span>
                         <p className="text-xs text-slate-600 italic line-clamp-1">"{ref.original}"</p>
                       </div>
@@ -610,7 +601,7 @@ export function VoiceAI() {
             </div>
           </ScrollArea>
 
-          <div className="p-6 border-t-2 border-slate-200 bg-white">
+          <div className="p-6 bg-slate-50">
             <div className="flex items-center gap-4 text-xs text-slate-600 font-semibold">
               <div className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
