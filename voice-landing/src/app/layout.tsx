@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
+import { CodirisWidget } from "@/components/codiris-widget";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -24,10 +25,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script src="https://talk.codiris.build/widget-loader.js" async></script>
+      </head>
       <body
         className={`${playfair.variable} ${dmSans.variable} font-sans antialiased`}
       >
         {children}
+        <CodirisWidget />
       <script src="/make-iframe-inject.js" /></body>
     </html>
   );

@@ -65,7 +65,7 @@ export const Hero = () => {
                 Try Codiris Voice
               </Button>
             </Link>
-            <a href="https://github.com/Humiris/codiris-voice/releases/latest/download/Codiris-Voice.dmg">
+            <Link href="/install">
               <Button
                 variant="outline"
                 className="border-slate-200 bg-white text-slate-900 rounded-full px-8 py-6 md:px-10 md:py-8 text-lg md:text-xl font-semibold transition-all duration-300 hover:bg-slate-50 hover:scale-105 active:scale-95 shadow-sm"
@@ -73,7 +73,7 @@ export const Hero = () => {
                 <img src="https://cdn-icons-png.flaticon.com/512/15/15476.png" alt="Apple" className="w-5 h-5 md:w-6 md:h-6 mr-3" />
                 Download for macOS
               </Button>
-            </a>
+            </Link>
           </div>
 
           <div className="flex flex-col items-center gap-3">

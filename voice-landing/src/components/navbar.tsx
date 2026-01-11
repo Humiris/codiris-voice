@@ -20,13 +20,14 @@ const AppleIcon = () => (
 const menuItems = [
   { label: "Home", href: "/" },
   { label: "Try Voice AI", href: "/voice" },
-  { label: "Download", href: "https://github.com/Humiris/codiris-voice/releases/latest/download/Codiris-Voice.dmg" },
+  { label: "Download", href: "/install" },
 ];
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { scrollY } = useScroll();
 
@@ -34,12 +35,21 @@ export const Navbar = () => {
   const navTop = useTransform(scrollY, [0, 100], ["0px", "20px"]);
 
   useEffect(() => {
+    setMounted(true);
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  if (!mounted) {
+    return (
+      <header className="fixed left-0 right-0 z-50 px-4 flex justify-center">
+        <nav className="max-w-7xl w-full bg-transparent border-transparent px-4 py-4 rounded-[2rem] border" />
+      </header>
+    );
+  }
 
   return (
     <motion.header
@@ -129,13 +139,13 @@ export const Navbar = () => {
               </div>
             </button>
 
-            <a href="https://github.com/Humiris/codiris-voice/releases/latest/download/Codiris-Voice.dmg">
+            <Link href="/install">
               <Button
                 className="hidden sm:flex rounded-full px-7 py-6 font-bold transition-all duration-500 active:scale-95 bg-white hover:bg-slate-50 text-slate-900 border-2 border-slate-200 hover:border-blue-300 hover:shadow-lg"
               >
                 Download
               </Button>
-            </a>
+            </Link>
 
             <Link href="/voice">
               <Button

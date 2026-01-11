@@ -1,5 +1,5 @@
 import React from "react";
-import { Github, Linkedin, Mail, ArrowUpRight } from "lucide-react";
+import { Linkedin, Mail, ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
@@ -28,7 +28,6 @@ export const Footer = () => {
               Building the Voice OS for the next generation of computing. Speak your mind, we'll do the rest.
             </p>
             <div className="flex gap-3">
-              <SocialIcon icon={Github} href="https://github.com/Humiris/codiris-voice" />
               <SocialIcon icon={Linkedin} href="https://www.linkedin.com/company/codirisbuild/" />
               <SocialIcon icon={Mail} href="https://humiris.substack.com/" />
             </div>
@@ -36,7 +35,7 @@ export const Footer = () => {
 
           <div>
             <h4 className="font-bold text-slate-900 mb-6 uppercase text-xs tracking-widest">Product</h4>
-            <FooterLink label="Download" href="https://github.com/Humiris/codiris-voice/releases/latest" />
+            <FooterLink label="Download" href="/install" />
             <FooterLink label="Try Voice AI" href="/voice" />
           </div>
         </div>
