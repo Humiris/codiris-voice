@@ -205,24 +205,23 @@ export function VoiceAI() {
   const latestRefinement = refinements[0];
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white font-sans selection:bg-blue-500/30 overflow-hidden flex flex-col">
-      {/* Background Glows */}
+    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-slate-200 overflow-hidden flex flex-col">
+      {/* Background Pattern */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full" />
+        <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-30" />
       </div>
 
       {/* Header */}
-      <header className="relative z-10 px-6 py-4 flex items-center justify-between border-b border-white/5 bg-slate-950/50 backdrop-blur-md">
+      <header className="relative z-10 px-6 py-4 flex items-center justify-between border-b border-slate-200 bg-white">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-lg shadow-blue-500/10 group-hover:scale-105 transition-transform overflow-hidden">
-            <img 
-              src="https://framerusercontent.com/images/6hd2q32TCQkqeTR6lgvTAQAClWE.svg?width=375&height=375" 
-              alt="Codiris" 
-              className="w-7 h-7 relative z-10"
+          <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform overflow-hidden">
+            <img
+              src="https://framerusercontent.com/images/6hd2q32TCQkqeTR6lgvTAQAClWE.svg?width=375&height=375"
+              alt="Codiris"
+              className="w-7 h-7 relative z-10 brightness-0 invert"
             />
           </div>
-          <span className="font-bold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">
+          <span className="font-bold text-xl tracking-tight text-slate-900">
             Codiris Voice
           </span>
         </Link>
@@ -239,16 +238,16 @@ export function VoiceAI() {
             {/* Visualizer & Control */}
             <div className="flex flex-col items-center justify-center space-y-8">
               <div className="relative">
-                <motion.div 
-                  animate={{ 
+                <motion.div
+                  animate={{
                     scale: isListening ? [1, 1.1, 1] : 1,
-                    opacity: isListening ? [0.3, 0.6, 0.3] : 0.1
+                    opacity: isListening ? [0.1, 0.2, 0.1] : 0.05
                   }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0 bg-blue-500/20 blur-[80px] rounded-full"
+                  className="absolute inset-0 bg-slate-900 blur-[80px] rounded-full"
                 />
-                
-                <div className="relative w-48 h-48 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center overflow-hidden shadow-2xl">
+
+                <div className="relative w-48 h-48 rounded-full bg-white border-2 border-slate-200 flex items-center justify-center overflow-hidden shadow-xl">
                   <div className="flex items-center gap-1 h-20">
                     {volume.map((v, i) => (
                       <motion.div
@@ -257,17 +256,17 @@ export function VoiceAI() {
                         transition={{ type: "spring", stiffness: 300, damping: 20 }}
                         className={cn(
                           "w-1 rounded-full transition-colors duration-300",
-                          isListening ? "bg-blue-400" : "bg-slate-700"
+                          isListening ? "bg-slate-900" : "bg-slate-300"
                         )}
                       />
                     ))}
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-14 h-14 rounded-full bg-slate-950/80 backdrop-blur-sm border border-white/10 flex items-center justify-center shadow-inner">
+                    <div className="w-14 h-14 rounded-full bg-slate-50 border-2 border-slate-200 flex items-center justify-center shadow-sm">
                       {isProcessing ? (
-                        <Loader2 className="w-6 h-6 text-blue-400 animate-spin" />
+                        <Loader2 className="w-6 h-6 text-slate-900 animate-spin" />
                       ) : (
-                        <AudioLines className={cn("w-6 h-6 transition-colors", isListening ? "text-blue-400" : "text-slate-600")} />
+                        <AudioLines className={cn("w-6 h-6 transition-colors", isListening ? "text-slate-900" : "text-slate-400")} />
                       )}
                     </div>
                   </div>
@@ -275,25 +274,25 @@ export function VoiceAI() {
               </div>
 
               <div className="text-center space-y-2">
-                <h2 className="text-2xl font-bold">
+                <h2 className="text-2xl font-bold text-slate-900">
                   {isListening ? "Listening..." : isProcessing ? "Transcribing your words..." : "Speak to Transcribe"}
                 </h2>
-                <p className="text-slate-400">We'll turn your spoken thoughts into clear text.</p>
+                <p className="text-slate-500">We'll turn your spoken thoughts into clear text.</p>
               </div>
 
               <button
                 onClick={isListening ? stopRecording : startRecording}
                 disabled={isProcessing}
                 className={cn(
-                  "group relative flex items-center gap-4 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 active:scale-95 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed",
-                  isListening 
-                    ? "bg-red-500/10 border border-red-500/50 text-red-400" 
-                    : "bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_40px_rgba(37,99,235,0.3)]"
+                  "group relative flex items-center gap-4 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 active:scale-95 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed shadow-lg",
+                  isListening
+                    ? "bg-red-50 border-2 border-red-200 text-red-600 hover:bg-red-100"
+                    : "bg-slate-900 hover:bg-slate-800 text-white border-2 border-slate-900"
                 )}
               >
                 <div className={cn(
                   "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
-                  isListening ? "bg-red-500/20" : "bg-white/20"
+                  isListening ? "bg-red-100" : "bg-white/10"
                 )}>
                   {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
                 </div>
@@ -312,7 +311,7 @@ export function VoiceAI() {
                 >
                   {/* Refinement Style Selector */}
                   <div className="space-y-3">
-                    <label className="text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-slate-600 flex items-center gap-2">
                       <Sparkles className="w-3 h-3" />
                       Refinement Style
                     </label>
@@ -327,10 +326,10 @@ export function VoiceAI() {
                           onClick={() => handleRegenerateWithStyle(style.value as any)}
                           disabled={isRegenerating}
                           className={cn(
-                            "flex-1 px-4 py-3 rounded-xl border transition-all text-left",
+                            "flex-1 px-4 py-3 rounded-xl border-2 transition-all text-left",
                             refinementStyle === style.value
-                              ? "bg-blue-500/20 border-blue-500/50 text-blue-400"
-                              : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:border-white/20",
+                              ? "bg-slate-900 border-slate-900 text-white"
+                              : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300",
                             isRegenerating && "opacity-50 cursor-not-allowed"
                           )}
                         >
@@ -346,10 +345,10 @@ export function VoiceAI() {
                     <button
                       onClick={() => setViewMode("both")}
                       className={cn(
-                        "px-4 py-2 rounded-xl text-sm font-semibold transition-all",
+                        "px-4 py-2 rounded-xl text-sm font-semibold transition-all border-2",
                         viewMode === "both"
-                          ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                          : "bg-white/5 text-slate-400 hover:bg-white/10"
+                          ? "bg-slate-900 text-white border-slate-900 shadow-lg"
+                          : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
                       )}
                     >
                       <ArrowRightLeft className="w-4 h-4 inline mr-2" />
@@ -358,10 +357,10 @@ export function VoiceAI() {
                     <button
                       onClick={() => setViewMode("refined")}
                       className={cn(
-                        "px-4 py-2 rounded-xl text-sm font-semibold transition-all",
+                        "px-4 py-2 rounded-xl text-sm font-semibold transition-all border-2",
                         viewMode === "refined"
-                          ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                          : "bg-white/5 text-slate-400 hover:bg-white/10"
+                          ? "bg-slate-900 text-white border-slate-900 shadow-lg"
+                          : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
                       )}
                     >
                       <Sparkles className="w-4 h-4 inline mr-2" />
@@ -373,34 +372,34 @@ export function VoiceAI() {
                   {viewMode === "both" ? (
                     <div className="grid md:grid-cols-2 gap-4">
                       {/* Original Transcript */}
-                      <div className="bg-white/5 border border-white/10 rounded-3xl p-6 space-y-4 relative group">
+                      <div className="bg-slate-50 border-2 border-slate-200 rounded-3xl p-6 space-y-4 relative group">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold uppercase tracking-widest text-slate-500">Original</span>
+                          <span className="text-xs font-bold uppercase tracking-widest text-slate-600">Original</span>
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-slate-200"
                             onClick={() => copyToClipboard(transcript, "transcript")}
                           >
-                            {copiedId === "transcript" ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                            {copiedId === "transcript" ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-slate-600" />}
                           </Button>
                         </div>
-                        <p className="text-base text-slate-400 leading-relaxed">
+                        <p className="text-base text-slate-600 leading-relaxed">
                           {transcript}
                         </p>
                       </div>
 
                       {/* Improved Version */}
-                      <div className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/30 rounded-3xl p-6 space-y-4 relative group">
+                      <div className="bg-white border-2 border-slate-900 rounded-3xl p-6 space-y-4 relative group shadow-lg">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold uppercase tracking-widest text-blue-400 flex items-center gap-2">
+                          <span className="text-xs font-bold uppercase tracking-widest text-slate-900 flex items-center gap-2">
                             <Sparkles className="w-3 h-3" />
                             Improved
                           </span>
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => setIsEditing(!isEditing)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-sm text-slate-400 transition-colors"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-sm text-slate-900 transition-colors font-semibold"
                             >
                               <Edit3 className="w-3 h-3" />
                               {isEditing ? "Stop" : "Edit"}
@@ -408,7 +407,7 @@ export function VoiceAI() {
                             <button
                               onClick={() => handleRegenerateWithStyle(refinementStyle)}
                               disabled={isRegenerating}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-sm text-slate-400 transition-colors disabled:opacity-50"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-sm text-slate-900 transition-colors disabled:opacity-50 font-semibold"
                             >
                               <RefreshCw className={cn("w-3 h-3", isRegenerating && "animate-spin")} />
                               Regen
@@ -416,16 +415,16 @@ export function VoiceAI() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-slate-100"
                               onClick={() => copyToClipboard(refinedText, "refined")}
                             >
-                              {copiedId === "refined" ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                              {copiedId === "refined" ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-slate-900" />}
                             </Button>
                           </div>
                         </div>
                         {isRegenerating ? (
                           <div className="p-8 flex items-center justify-center">
-                            <div className="flex items-center gap-3 text-blue-400">
+                            <div className="flex items-center gap-3 text-slate-900">
                               <Loader2 className="w-5 h-5 animate-spin" />
                               <span className="font-medium">Regenerating...</span>
                             </div>
@@ -434,11 +433,11 @@ export function VoiceAI() {
                           <textarea
                             value={editedText}
                             onChange={(e) => setEditedText(e.target.value)}
-                            className="w-full p-4 rounded-xl bg-white/5 border border-blue-500/30 text-white leading-relaxed font-medium resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                            className="w-full p-4 rounded-xl bg-slate-50 border-2 border-slate-200 text-slate-900 leading-relaxed font-medium resize-none focus:outline-none focus:ring-2 focus:ring-slate-900"
                             rows={6}
                           />
                         ) : (
-                          <p className="text-base text-white leading-relaxed font-medium">
+                          <p className="text-base text-slate-900 leading-relaxed font-medium">
                             {refinedText}
                           </p>
                         )}
@@ -449,13 +448,13 @@ export function VoiceAI() {
                                 setIsEditing(false);
                                 setEditedText(refinedText);
                               }}
-                              className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 font-semibold transition-colors text-sm"
+                              className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold transition-colors text-sm border-2 border-slate-200"
                             >
                               Cancel
                             </button>
                             <button
                               onClick={handleAccept}
-                              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-colors text-sm"
+                              className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold transition-colors text-sm"
                             >
                               Save Changes
                             </button>
@@ -465,16 +464,16 @@ export function VoiceAI() {
                     </div>
                   ) : (
                     /* Refined Only View */
-                    <div className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/30 rounded-3xl p-8 space-y-4 relative group">
+                    <div className="bg-white border-2 border-slate-900 rounded-3xl p-8 space-y-4 relative group shadow-lg">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-widest text-blue-400 flex items-center gap-2">
+                        <span className="text-xs font-bold uppercase tracking-widest text-slate-900 flex items-center gap-2">
                           <Sparkles className="w-3 h-3" />
                           Improved Version
                         </span>
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => setIsEditing(!isEditing)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-sm text-slate-400 transition-colors"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-sm text-slate-900 transition-colors font-semibold"
                           >
                             <Edit3 className="w-3 h-3" />
                             {isEditing ? "Stop" : "Edit"}
@@ -482,7 +481,7 @@ export function VoiceAI() {
                           <button
                             onClick={() => handleRegenerateWithStyle(refinementStyle)}
                             disabled={isRegenerating}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-sm text-slate-400 transition-colors disabled:opacity-50"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-sm text-slate-900 transition-colors disabled:opacity-50 font-semibold"
                           >
                             <RefreshCw className={cn("w-3 h-3", isRegenerating && "animate-spin")} />
                             Regen
@@ -490,16 +489,16 @@ export function VoiceAI() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-slate-100"
                             onClick={() => copyToClipboard(refinedText, "refined")}
                           >
-                            {copiedId === "refined" ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                            {copiedId === "refined" ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-slate-900" />}
                           </Button>
                         </div>
                       </div>
                       {isRegenerating ? (
                         <div className="p-8 flex items-center justify-center">
-                          <div className="flex items-center gap-3 text-blue-400">
+                          <div className="flex items-center gap-3 text-slate-900">
                             <Loader2 className="w-5 h-5 animate-spin" />
                             <span className="font-medium">Regenerating...</span>
                           </div>
@@ -508,11 +507,11 @@ export function VoiceAI() {
                         <textarea
                           value={editedText}
                           onChange={(e) => setEditedText(e.target.value)}
-                          className="w-full p-4 rounded-xl bg-white/5 border border-blue-500/30 text-white leading-relaxed font-medium resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                          className="w-full p-4 rounded-xl bg-slate-50 border-2 border-slate-200 text-slate-900 leading-relaxed font-medium resize-none focus:outline-none focus:ring-2 focus:ring-slate-900"
                           rows={8}
                         />
                       ) : (
-                        <p className="text-lg text-white leading-relaxed font-medium">
+                        <p className="text-lg text-slate-900 leading-relaxed font-medium">
                           {refinedText}
                         </p>
                       )}
@@ -523,13 +522,13 @@ export function VoiceAI() {
                               setIsEditing(false);
                               setEditedText(refinedText);
                             }}
-                            className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 font-semibold transition-colors text-sm"
+                            className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold transition-colors text-sm border-2 border-slate-200"
                           >
                             Cancel
                           </button>
                           <button
                             onClick={handleAccept}
-                            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-colors text-sm"
+                            className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold transition-colors text-sm"
                           >
                             Save Changes
                           </button>
@@ -543,9 +542,9 @@ export function VoiceAI() {
 
             {/* Empty State */}
             {!transcript && !isListening && !isProcessing && (
-              <div className="flex flex-col items-center justify-center py-20 text-slate-600 space-y-4">
-                <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center">
-                  <Sparkles className="w-10 h-10 opacity-20" />
+              <div className="flex flex-col items-center justify-center py-20 text-slate-500 space-y-4">
+                <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center border-2 border-slate-200">
+                  <Sparkles className="w-10 h-10 text-slate-300" />
                 </div>
                 <p className="text-lg">Your transcript will appear here.</p>
               </div>
@@ -554,17 +553,17 @@ export function VoiceAI() {
         </div>
 
         {/* Right Side: History Sidebar */}
-        <div className="hidden lg:flex flex-col w-96 bg-slate-950/30 backdrop-blur-sm border-l border-white/5">
-          <div className="p-6 border-b border-white/5 flex items-center justify-between">
-            <div className="flex items-center gap-2 font-semibold">
-              <History className="w-4 h-4 text-blue-400" />
+        <div className="hidden lg:flex flex-col w-96 bg-slate-50 border-l-2 border-slate-200">
+          <div className="p-6 border-b-2 border-slate-200 flex items-center justify-between">
+            <div className="flex items-center gap-2 font-semibold text-slate-900">
+              <History className="w-4 h-4" />
               Recent Sessions
             </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={clearHistory}
-              className="text-slate-500 hover:text-red-400 hover:bg-red-400/10"
+              className="text-slate-500 hover:text-red-600 hover:bg-red-50"
             >
               <Trash2 className="w-4 h-4" />
             </Button>
@@ -573,36 +572,36 @@ export function VoiceAI() {
           <ScrollArea className="flex-1 p-6">
             <div className="space-y-6">
               {refinements.length === 0 ? (
-                <div className="text-center py-12 text-slate-600">
+                <div className="text-center py-12 text-slate-500">
                   <p className="text-sm">No history yet</p>
                 </div>
               ) : (
                 refinements.map((ref) => (
                   <div
                     key={ref.id}
-                    className="group p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-blue-500/30 transition-all cursor-pointer"
+                    className="group p-4 rounded-2xl bg-white border-2 border-slate-200 hover:border-slate-900 transition-all cursor-pointer"
                     onClick={() => {
                       setTranscript(ref.original);
                       setRefinedText(ref.refined);
                     }}
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-[10px] text-slate-500 uppercase tracking-wider">
+                      <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">
                         {ref.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </span>
-                      <ArrowRight className="w-3 h-3 text-slate-600 group-hover:text-blue-400 transition-colors" />
+                      <ArrowRight className="w-3 h-3 text-slate-400 group-hover:text-slate-900 transition-colors" />
                     </div>
                     <div className="space-y-2">
                       <div>
-                        <span className="text-[9px] text-blue-400 uppercase tracking-wider font-bold flex items-center gap-1 mb-1">
+                        <span className="text-[9px] text-slate-900 uppercase tracking-wider font-bold flex items-center gap-1 mb-1">
                           <Sparkles className="w-2.5 h-2.5" />
                           Improved
                         </span>
-                        <p className="text-sm text-slate-200 line-clamp-2">{ref.refined}</p>
+                        <p className="text-sm text-slate-900 line-clamp-2 font-medium">{ref.refined}</p>
                       </div>
-                      <div className="pt-2 border-t border-white/5">
-                        <span className="text-[9px] text-slate-600 uppercase tracking-wider font-bold mb-1 block">Original</span>
-                        <p className="text-xs text-slate-500 italic line-clamp-1">"{ref.original}"</p>
+                      <div className="pt-2 border-t border-slate-200">
+                        <span className="text-[9px] text-slate-500 uppercase tracking-wider font-bold mb-1 block">Original</span>
+                        <p className="text-xs text-slate-600 italic line-clamp-1">"{ref.original}"</p>
                       </div>
                     </div>
                   </div>
@@ -611,8 +610,8 @@ export function VoiceAI() {
             </div>
           </ScrollArea>
 
-          <div className="p-6 border-t border-white/5 bg-slate-950/50">
-            <div className="flex items-center gap-4 text-xs text-slate-500">
+          <div className="p-6 border-t-2 border-slate-200 bg-white">
+            <div className="flex items-center gap-4 text-xs text-slate-600 font-semibold">
               <div className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
                 Whisper-1
