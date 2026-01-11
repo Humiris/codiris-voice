@@ -3,21 +3,17 @@
 import { useEffect, useRef } from "react";
 
 export function CodirisWidget() {
-  const widgetRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Widget will be initialized by the external script
-    // This component just renders the container client-side only
+    if (containerRef.current && !containerRef.current.querySelector('codiris-widget')) {
+      const widget = document.createElement('codiris-widget');
+      widget.setAttribute('agent-id', 'project-1764993332731');
+      widget.setAttribute('width', '376');
+      widget.setAttribute('prompt-bar', 'true');
+      containerRef.current.appendChild(widget);
+    }
   }, []);
 
-  return (
-    <div ref={widgetRef} suppressHydrationWarning>
-      <codiris-widget
-        agent-id="project-1764993332731"
-        width="376"
-        prompt-bar="true"
-        suppressHydrationWarning
-      ></codiris-widget>
-    </div>
-  );
+  return <div ref={containerRef} suppressHydrationWarning />;
 }
