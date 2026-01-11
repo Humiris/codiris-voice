@@ -16,6 +16,10 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Codiris Voice - Don't type, just speak",
   description: "The voice-to-text AI that turns speech into clear, polished writing in every app.",
+  icons: {
+    icon: "https://framerusercontent.com/images/6hd2q32TCQkqeTR6lgvTAQAClWE.svg",
+    apple: "https://framerusercontent.com/images/6hd2q32TCQkqeTR6lgvTAQAClWE.svg",
+  },
 };
 
 export default function RootLayout({
