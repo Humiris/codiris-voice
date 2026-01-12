@@ -12,6 +12,8 @@ from voicetype.settings import load_config, save_config
 from voicetype.ui.web_ui import start_web_ui, add_to_history, set_recording, set_processing
 from voicetype.ui.floating_bar import show_recording_bar, show_processing_bar, show_idle_bar, set_click_callback, set_stop_callback, set_settings_callback
 from voicetype.ui.dashboard_window import show_dashboard
+from voicetype.ui.review_window import show_review
+from voicetype.ui.settings_usage_window import update_usage_stats
 
 
 def check_accessibility_permission():
@@ -46,6 +48,7 @@ def get_resource_path(relative_path):
 
 # Queue for main thread tasks
 _pending_actions = []
+_pending_review_data = None
 
 
 class VoiceTypeApp(rumps.App):
@@ -58,7 +61,9 @@ class VoiceTypeApp(rumps.App):
         self.config = load_config()
 
         self.recorder = AudioRecorder()
-        self.transcriber = Transcriber(self.config["api_key"], local=self.config.get("local_processing", False))
+        # Get transcription model from config (default to gpt4o)
+        transcription_model = self.config.get("transcription_model", "gpt4o")
+        self.transcriber = Transcriber(self.config["api_key"], model=transcription_model)
         self.injector = TextInjector()
         self.enhancer = AIEnhancer(self.config["api_key"])
 
@@ -93,6 +98,7 @@ class VoiceTypeApp(rumps.App):
             rumps.MenuItem("Status: Idle", callback=None),
             None,
             rumps.MenuItem("Open Codiris Voice", callback=self.open_main_window),
+            rumps.MenuItem("Settings & Usage", callback=self.open_settings),
             None,
             self.mode_menu,
             self.local_toggle,
@@ -133,7 +139,7 @@ class VoiceTypeApp(rumps.App):
         _pending_actions.append("settings")
 
     def _check_pending(self, _):
-        global _pending_actions
+        global _pending_actions, _pending_review_data
         while _pending_actions:
             action = _pending_actions.pop(0)
             try:
@@ -147,6 +153,10 @@ class VoiceTypeApp(rumps.App):
                     self._stop_recording()
                 elif action == "settings":
                     show_dashboard()
+                elif action == "show_review":
+                    if _pending_review_data:
+                        show_review(**_pending_review_data)
+                        _pending_review_data = None
                 elif action == "finalize":
                     self._finalize_ui()
             except Exception as e:
@@ -171,6 +181,10 @@ class VoiceTypeApp(rumps.App):
 
     def open_main_window(self, _):
         """Open the dashboard window"""
+        show_dashboard()
+
+    def open_settings(self, _):
+        """Open the dashboard settings page"""
         show_dashboard()
 
     def change_mode(self, sender):
@@ -218,27 +232,95 @@ class VoiceTypeApp(rumps.App):
             temp_path = self.recorder.stop_recording()
             threading.Thread(target=self.process_audio, args=(temp_path,)).start()
 
+    def _apply_custom_words(self, text):
+        """Apply custom word replacements to transcribed text"""
+        custom_words = self.config.get("custom_words", {})
+        if not custom_words:
+            return text
+
+        import re
+        # Apply replacements (case-insensitive matching, preserve original case pattern)
+        for wrong_word, correct_word in custom_words.items():
+            # Create case-insensitive pattern with word boundaries
+            pattern = r'\b' + re.escape(wrong_word) + r'\b'
+            text = re.sub(pattern, correct_word, text, flags=re.IGNORECASE)
+
+        print(f"After custom word replacement: {text}")
+        return text
+
     def process_audio(self, file_path):
         try:
             if not file_path:
                 return
 
-            print(f"Transcribing {file_path}...")
+            # Reload config to get latest model setting
+            self.config = load_config()
+            current_model = self.config.get("transcription_model", "gpt4o")
+            self.transcriber.set_model(current_model)
+
+            # Set API keys for different providers
+            if self.config.get("groq_api_key"):
+                self.transcriber.set_groq_key(self.config["groq_api_key"])
+            if self.config.get("deepgram_api_key"):
+                self.transcriber.set_deepgram_key(self.config["deepgram_api_key"])
+            if self.config.get("assemblyai_api_key"):
+                self.transcriber.set_assemblyai_key(self.config["assemblyai_api_key"])
+
+            print(f"Transcribing {file_path} with model: {current_model}...")
             text = self.transcriber.transcribe(file_path, language=self.config.get("language"))
 
             if text:
                 print(f"Transcription: {text}")
+
+                # Apply custom word replacements
+                text = self._apply_custom_words(text)
                 is_command = text.lower().strip() in ["new line", "new paragraph", "delete that"]
 
-                # Apply enhancement if needed
-                if self.config["mode"] != "Raw" and not is_command:
-                    text = self.enhancer.enhance(text, mode=self.config["mode"])
+                # Track usage statistics
+                char_count = len(text)
+                api_calls = 1  # Whisper call
+                if self.config["mode"] != "Raw":
+                    api_calls += 1  # GPT call for enhancement
 
-                print(f"Delivering: {text}")
-                self.injector.inject_text(text, to_clipboard=self.config.get("clipboard_mode", False))
+                update_usage_stats(char_count, is_api_call=True)
 
-                # Add to history
-                add_to_history(text)
+                # For commands, execute immediately without review
+                if is_command:
+                    self.injector.inject_text(text, to_clipboard=False)
+                    add_to_history(text)
+                else:
+                    # PASTE ORIGINAL TEXT IMMEDIATELY - no waiting!
+                    original_text = text
+                    print(f"Pasting original text immediately: {original_text}")
+                    self.injector.inject_text(original_text, to_clipboard=self.config.get("clipboard_mode", False))
+                    add_to_history(original_text)
+
+                    # Generate improved version in background and show as suggestion
+                    if self.config["mode"] != "Raw":
+                        refined_text = self.enhancer.enhance(text, mode=self.config["mode"])
+
+                        # Map mode to style
+                        style_map = {
+                            "Format": "professional",
+                            "Clean": "casual",
+                            "Notes": "concise"
+                        }
+                        current_style = style_map.get(self.config["mode"], "professional")
+
+                        print(f"DEBUG: Queueing suggestion bubble for main thread")
+                        print(f"DEBUG: Original: {original_text[:50] if len(original_text) > 50 else original_text}")
+                        print(f"DEBUG: Improved: {refined_text[:50] if len(refined_text) > 50 else refined_text}")
+                        print(f"DEBUG: Style: {current_style}")
+
+                        # Queue bubble to be shown on main thread (just to show suggestion)
+                        global _pending_review_data
+                        _pending_review_data = {
+                            'original_text': original_text,
+                            'refined_text': refined_text,
+                            'style': current_style,
+                            'on_accept': None  # No callback needed - already pasted
+                        }
+                        _pending_actions.append("show_review")
 
             if os.path.exists(file_path):
                 os.remove(file_path)
@@ -304,18 +386,7 @@ if __name__ == "__main__":
     # Run the menu bar app
     app = VoiceTypeApp()
 
-    # Open dashboard on startup (after app is initialized, on main thread)
-    def open_dashboard_on_start(_):
-        show_dashboard()
-
-    startup_timer = rumps.Timer(open_dashboard_on_start, 0.5)
-    startup_timer.start()
-
-    # Stop the timer after first run
-    def stop_startup_timer(_):
-        startup_timer.stop()
-
-    stop_timer = rumps.Timer(stop_startup_timer, 1.0)
-    stop_timer.start()
+    # Dashboard can be opened from menu bar icon click
+    # (removed auto-open on startup - user wants minimal bubble-only UI)
 
     app.run()

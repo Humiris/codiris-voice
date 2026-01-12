@@ -2,117 +2,88 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Play, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
 export const Hero = () => {
   return (
-    <section className="relative pt-32 pb-24 overflow-hidden bg-[#f8fafc]">
-      {/* Background Glows */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-200/30 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[10%] right-[-10%] w-[40%] h-[40%] bg-indigo-200/20 blur-[120px] rounded-full" />
-      </div>
-
-      {/* Decorative Floating Text - Static for performance */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-50">
-        <div className="whitespace-nowrap text-7xl font-serif italic text-blue-900/5 absolute -top-10 -left-20 rotate-[-5deg]">
-          "I'll be there in five minutes" • "Let's schedule a meeting"
-        </div>
-        <div className="whitespace-nowrap text-7xl font-serif italic text-blue-900/5 absolute -bottom-10 -right-20 rotate-[5deg]">
-          "Happy birthday!" • "See you at the conference"
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-        <motion.h1 
+    <section className="relative pt-40 pb-32 overflow-hidden bg-[#f5f5f7]">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+        {/* Main Headline */}
+        <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-          className="text-6xl md:text-[8rem] font-serif text-slate-900 leading-[0.85] mb-10 tracking-tight"
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="text-5xl md:text-7xl font-bold text-slate-900 leading-tight mb-6 tracking-tight"
         >
-          Speak your mind, <br />
-          <span className="italic font-normal text-blue-600 relative">
-            we'll do the rest
-            <svg className="absolute -bottom-2 left-0 w-full h-4 text-blue-200 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
-              <path d="M0 5 Q 25 0 50 5 T 100 5" fill="none" stroke="currentColor" strokeWidth="4" />
-            </svg>
-          </span>
+          Your voice,{" "}
+          <span className="text-blue-600">perfected</span>
         </motion.h1>
 
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="max-w-2xl mx-auto text-lg md:text-xl text-slate-600 mb-12 font-sans leading-relaxed"
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="max-w-xl mx-auto text-lg md:text-xl text-slate-600 mb-10 leading-relaxed"
         >
-          Turn messy thoughts into polished prose, instantly. The fastest way to write is to speak.
+          Speak naturally, get polished text instantly. The fastest way to write emails, notes, and messages.
         </motion.p>
 
-        <motion.div 
+        {/* CTA Button - Like Cluely */}
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="flex flex-col items-center gap-8"
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="flex flex-col items-center gap-6"
         >
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <Link href="/voice">
-              <Button
-                className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 py-6 md:px-10 md:py-8 text-lg md:text-xl font-semibold transition-all duration-300 shadow-[0_20px_50px_rgba(37,99,235,0.3)] hover:scale-105 active:scale-95"
-              >
-                <Play className="w-5 h-5 md:w-6 md:h-6 mr-3 fill-current" />
-                Try Codiris Voice
-              </Button>
-            </Link>
-            <Link href="/install">
-              <Button
-                variant="outline"
-                className="border-slate-200 bg-white text-slate-900 rounded-full px-8 py-6 md:px-10 md:py-8 text-lg md:text-xl font-semibold transition-all duration-300 hover:bg-slate-50 hover:scale-105 active:scale-95 shadow-sm"
-              >
-                <img src="https://cdn-icons-png.flaticon.com/512/15/15476.png" alt="Apple" className="w-5 h-5 md:w-6 md:h-6 mr-3" />
-                Download for macOS
-              </Button>
-            </Link>
-          </div>
+          <Link href="/install">
+            <Button
+              className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-10 py-7 text-lg font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 flex items-center gap-3"
+            >
+              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+              </svg>
+              Get for Mac
+            </Button>
+          </Link>
 
-          <div className="flex flex-col items-center gap-3">
-            <div className="flex -space-x-3">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white bg-slate-200 overflow-hidden">
-                  <img src={`https://i.pravatar.cc/100?img=${i + 10}`} alt="User" className="w-full h-full object-cover" />
-                </div>
-              ))}
-              <div className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white bg-blue-600 flex items-center justify-center text-[8px] md:text-[10px] font-bold text-white">
-                +2k
-              </div>
-            </div>
-            <p className="text-slate-500 text-sm md:text-base font-medium">
-              Trusted by <span className="text-slate-900 font-bold">2,000+</span> professionals worldwide
-            </p>
-          </div>
+          <p className="text-slate-500 text-sm">
+            Free to try. Works on macOS 10.15+
+          </p>
         </motion.div>
 
-        {/* Waveform Indicator */}
-        <div className="mt-20 flex justify-center items-center gap-1.5 md:gap-2 h-16 md:h-20">
-          {[...Array(30)].map((_, i) => (
-            <motion.div
-              key={i}
-              animate={{ 
-                height: [15, Math.random() * 60 + 15, 15],
-                opacity: [0.3, 0.6, 0.3],
-                backgroundColor: ["#2563eb", "#60a5fa", "#2563eb"]
-              }}
-              transition={{ 
-                duration: 1 + Math.random(), 
-                repeat: Infinity, 
-                delay: i * 0.02,
-                ease: "easeInOut"
-              }}
-              className="w-1.5 md:w-2 bg-blue-600 rounded-full"
-            />
-          ))}
-        </div>
+        {/* Product Preview Image Placeholder */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="mt-16 relative"
+        >
+          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 p-8 max-w-2xl mx-auto">
+            {/* Waveform visualization */}
+            <div className="flex justify-center items-center gap-1 h-20 mb-6">
+              {[...Array(40)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  animate={{
+                    height: [8, Math.random() * 50 + 8, 8],
+                  }}
+                  transition={{
+                    duration: 1.5 + Math.random(),
+                    repeat: Infinity,
+                    delay: i * 0.03,
+                    ease: "easeInOut"
+                  }}
+                  className="w-1 bg-blue-500 rounded-full"
+                />
+              ))}
+            </div>
+            <div className="text-center">
+              <p className="text-slate-400 text-sm font-medium">Speak naturally...</p>
+              <p className="text-slate-900 text-lg font-medium mt-2">"Hey, can you let me know when you're free for a quick call?"</p>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

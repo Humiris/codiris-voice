@@ -407,6 +407,127 @@ HTML_CONTENT = '''
             align-items: center;
             gap: 12px;
             color: white;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .user-info:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Profile Popup */
+        .profile-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .profile-popup.active {
+            display: flex;
+        }
+        .profile-popup-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .profile-popup h3 {
+            margin: 0 0 20px 0;
+            font-size: 20px;
+            color: #1a1a2e;
+        }
+        .profile-avatar-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .profile-avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 10px;
+            background-size: cover;
+            background-position: center;
+        }
+        .upload-btn {
+            background: #f0f0f0;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .upload-btn:hover {
+            background: #e0e0e0;
+        }
+        .profile-field {
+            margin-bottom: 15px;
+        }
+        .profile-field label {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .profile-field input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .profile-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .profile-actions button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+        .profile-save {
+            background: #2f0df4;
+            color: white;
+        }
+        .profile-cancel {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .profile-signout {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            background: none;
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .profile-signout:hover {
+            background: #fff5f5;
         }
         .user-avatar {
             width: 40px;
@@ -978,18 +1099,18 @@ HTML_CONTENT = '''
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 History
             </div>
+            <div class="nav-item" onclick="showPage('training')">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                Word Training
+            </div>
             <div class="nav-item" onclick="showPage('settings')">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 Settings
             </div>
-            <div class="nav-item" onclick="showPage('account')">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                Account
-            </div>
         </nav>
 
         <div class="user-section">
-            <div class="user-info" id="sidebar-user">
+            <div class="user-info" id="sidebar-user" onclick="openProfilePopup()">
                 <div class="user-avatar" id="sidebar-avatar">?</div>
                 <div>
                     <div class="user-name" id="sidebar-name">Not signed in</div>
@@ -1029,17 +1150,24 @@ HTML_CONTENT = '''
 
             <div class="stats-grid">
                 <div class="stat-card">
-                    <h3>Transcriptions Today</h3>
-                    <div class="value" id="todayCount">0</div>
+                    <h3>Total Transcriptions</h3>
+                    <div class="value" id="totalTranscriptions">0</div>
                 </div>
                 <div class="stat-card">
-                    <h3>Words Transcribed</h3>
-                    <div class="value" id="wordCount">0</div>
+                    <h3>Characters Transcribed</h3>
+                    <div class="value" id="totalCharacters">0</div>
                 </div>
                 <div class="stat-card">
-                    <h3>Time Saved</h3>
-                    <div class="value" id="timeSaved">0 <span>min</span></div>
+                    <h3>API Requests</h3>
+                    <div class="value" id="totalRequests">0</div>
                 </div>
+                <div class="stat-card">
+                    <h3>This Month</h3>
+                    <div class="value" id="monthTranscriptions">0</div>
+                </div>
+            </div>
+            <div style="margin-top: 10px; color: #666; font-size: 12px;">
+                <span id="lastUsed">Last used: Never</span>
             </div>
 
             <div class="section-card">
@@ -1132,10 +1260,16 @@ HTML_CONTENT = '''
                     <h4>Transcription</h4>
                     <div class="setting-item">
                         <div>
-                            <div class="setting-label">Local Processing</div>
-                            <div class="setting-desc">Use offline Whisper model (slower but private)</div>
+                            <div class="setting-label">Speech-to-Text Model</div>
+                            <div class="setting-desc">Choose the AI model for transcription</div>
                         </div>
-                        <div class="toggle" onclick="this.classList.toggle('active')"></div>
+                        <select id="transcriptionModel" onchange="updateTranscriptionModel(this.value)">
+                            <option value="gpt4o">GPT-4o Audio (Best quality)</option>
+                            <option value="whisper">OpenAI Whisper (Fast)</option>
+                            <option value="groq">Groq Whisper (Very fast, free tier)</option>
+                            <option value="deepgram">Deepgram Nova-2 (High accuracy)</option>
+                            <option value="assemblyai">AssemblyAI (Great for accents)</option>
+                        </select>
                     </div>
                     <div class="setting-item">
                         <div>
@@ -1207,77 +1341,44 @@ HTML_CONTENT = '''
                         <span style="color: #2f0df4; font-weight: 600;">fn (🌐)</span>
                     </div>
                 </div>
+
             </div>
         </div>
 
-        <!-- Account Page -->
-        <div class="page" id="page-account">
-            <div class="page-header">
-                <h2>Account</h2>
-                <p>Manage your Codiris Voice account</p>
+        <!-- Training Page -->
+        <div class="page" id="page-training">
+            <h2>Word Training</h2>
+            <p style="color: #666; margin-bottom: 30px;">Train custom words so Codiris Voice recognizes them correctly. When the AI transcribes a word incorrectly, add it here to fix it automatically.</p>
+
+            <div class="settings-group">
+                <h4>Add New Word</h4>
+                <div class="setting-item" style="flex-direction: column; align-items: stretch; gap: 15px;">
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <div style="flex: 1;">
+                            <div class="setting-label" style="margin-bottom: 5px;">AI hears:</div>
+                            <input type="text" id="wrong-word" placeholder="e.g., codex" style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+                        </div>
+                        <div style="padding-top: 20px; font-size: 24px; color: #2f0df4;">→</div>
+                        <div style="flex: 1;">
+                            <div class="setting-label" style="margin-bottom: 5px;">Should be:</div>
+                            <input type="text" id="correct-word" placeholder="e.g., Codiris" style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+                        </div>
+                        <button onclick="addCustomWord()" style="background: #2f0df4; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 20px; font-size: 15px;">Add</button>
+                    </div>
+                </div>
             </div>
 
-            <!-- Login Section (shown when not logged in) -->
-            <div class="section-card" id="login-section">
-                <div class="login-section">
-                    <h3>Sign in to Codiris Voice</h3>
-                    <p>Connect your account to sync settings across devices and access premium features</p>
-                    <button class="google-btn" onclick="signInWithGoogle()">
-                        <svg viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                        </svg>
-                        Continue with Google
-                    </button>
+            <div class="settings-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h4 style="margin: 0;">Trained Words</h4>
+                    <button onclick="clearCustomWords()" style="background: #ff4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer;">Clear All</button>
                 </div>
-            </div>
-
-            <!-- User Profile Section (shown when logged in) -->
-            <div id="user-section" style="display: none;">
-                <div class="section-card">
-                    <div class="user-profile" id="user-profile">
-                        <img id="user-avatar" src="" alt="Profile">
-                        <div class="user-profile-info">
-                            <h4 id="user-name">User Name</h4>
-                            <p id="user-email">user@example.com</p>
-                        </div>
-                        <button class="logout-btn" onclick="signOut()">Sign Out</button>
-                    </div>
-                </div>
-
-                <div class="plan-card">
-                    <h3>CURRENT PLAN</h3>
-                    <div class="plan-name">Pro Plan</div>
-                    <div class="plan-features">
-                        <div class="plan-feature">✓ Unlimited transcriptions</div>
-                        <div class="plan-feature">✓ AI enhancement modes</div>
-                        <div class="plan-feature">✓ Priority processing</div>
-                    </div>
-                </div>
-
-                <div class="section-card">
-                    <div class="settings-group">
-                        <h4>Usage This Month</h4>
-                        <div class="setting-item">
-                            <div>
-                                <div class="setting-label">API Calls</div>
-                                <div class="setting-desc">Whisper + GPT-4o-mini requests</div>
-                            </div>
-                            <div style="font-weight: 600; color: #2f0df4;" id="apiCalls">0 / Unlimited</div>
-                        </div>
-                        <div class="setting-item">
-                            <div>
-                                <div class="setting-label">Words Processed</div>
-                                <div class="setting-desc">Total words transcribed this month</div>
-                            </div>
-                            <div style="font-weight: 600;" id="totalWords">0</div>
-                        </div>
-                    </div>
+                <div id="custom-words-list" style="padding: 20px; background: #f8f8f8; border-radius: 12px; min-height: 150px;">
+                    <p style="color: #999; text-align: center;">No custom words yet</p>
                 </div>
             </div>
         </div>
+
     </div>
     </div> <!-- End app-container -->
 
@@ -1515,13 +1616,6 @@ HTML_CONTENT = '''
             }
             document.getElementById('sidebar-name').textContent = user.name;
             document.getElementById('sidebar-plan').textContent = 'Pro Plan';
-
-            // Update account page
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('user-section').style.display = 'block';
-            document.getElementById('user-avatar').src = user.picture || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) + '&background=2f0df4&color=fff';
-            document.getElementById('user-name').textContent = user.name;
-            document.getElementById('user-email').textContent = user.email;
         }
 
         function signOut() {
@@ -1540,9 +1634,6 @@ HTML_CONTENT = '''
             document.getElementById('sidebar-avatar').style.backgroundImage = '';
             document.getElementById('sidebar-name').textContent = 'Not signed in';
             document.getElementById('sidebar-plan').textContent = 'Sign in to continue';
-
-            document.getElementById('login-section').style.display = 'block';
-            document.getElementById('user-section').style.display = 'none';
 
             // Revoke Google access if available
             if (typeof google !== 'undefined' && google.accounts) {
@@ -1591,7 +1682,42 @@ HTML_CONTENT = '''
         window.onload = function() {
             checkExistingLogin();
             setTimeout(initGoogleSignIn, 500);
+            loadCustomWords();
+            loadSettings();
+            loadUsageStats();
         };
+
+        function loadSettings() {
+            fetch('/get-settings')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.transcription_model) {
+                        document.getElementById('transcriptionModel').value = data.transcription_model;
+                    }
+                    if (data.bar_color) {
+                        document.getElementById('barColor').value = data.bar_color;
+                    }
+                    if (data.bar_position) {
+                        document.getElementById('barPosition').value = data.bar_position;
+                    }
+                });
+        }
+
+        function loadUsageStats() {
+            fetch('/get-usage')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('totalTranscriptions').textContent = data.total_transcriptions || 0;
+                    document.getElementById('totalCharacters').textContent = data.total_characters || 0;
+                    document.getElementById('totalRequests').textContent = data.total_requests || 0;
+                    document.getElementById('monthTranscriptions').textContent = data.month_transcriptions || 0;
+                    document.getElementById('lastUsed').textContent = 'Last used: ' + (data.last_used || 'Never');
+                })
+                .catch(e => console.log('Error loading usage stats'));
+        }
+
+        // Refresh usage stats periodically
+        setInterval(loadUsageStats, 5000);
 
         function showPage(pageName) {
             // Hide all pages
@@ -1624,6 +1750,22 @@ HTML_CONTENT = '''
             });
         }
 
+        function updateTranscriptionModel(value) {
+            fetch('/set-setting', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: 'transcription_model', value: value })
+            });
+        }
+
+        function saveApiKey(keyName, value) {
+            fetch('/set-setting', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: keyName, value: value })
+            });
+        }
+
         function updateBarPosition(value) {
             fetch('/set-setting', {
                 method: 'POST',
@@ -1637,6 +1779,182 @@ HTML_CONTENT = '''
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ key: 'bar_color', value: value })
+            });
+        }
+
+        // Profile editing functions
+        function saveProfile() {
+            const name = document.getElementById('edit-name').value.trim();
+            const picture = document.getElementById('edit-picture').value.trim();
+
+            if (!name) {
+                alert('Please enter a name');
+                return;
+            }
+
+            const updatedUser = {
+                ...currentUser,
+                name: name,
+                picture: picture || currentUser.picture
+            };
+
+            fetch('/set-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedUser)
+            }).then(() => {
+                currentUser = updatedUser;
+                localStorage.setItem('codiris_user', JSON.stringify(updatedUser));
+                updateUIForUser(updatedUser);
+                alert('Profile updated successfully!');
+            });
+        }
+
+        // Profile popup functions
+        let uploadedPictureData = null;
+
+        function openProfilePopup() {
+            if (!currentUser) {
+                // Not logged in, trigger sign in
+                startGoogleSignIn();
+                return;
+            }
+
+            // Populate popup with current data
+            document.getElementById('popup-edit-name').value = currentUser.name || '';
+            document.getElementById('popup-edit-email').value = currentUser.email || '';
+
+            const preview = document.getElementById('profile-avatar-preview');
+            if (currentUser.picture) {
+                preview.style.backgroundImage = 'url(' + currentUser.picture + ')';
+                preview.textContent = '';
+            } else {
+                preview.style.backgroundImage = '';
+                preview.textContent = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : '?';
+            }
+
+            uploadedPictureData = null;
+            document.getElementById('profile-popup').classList.add('active');
+        }
+
+        function closeProfilePopup() {
+            document.getElementById('profile-popup').classList.remove('active');
+            uploadedPictureData = null;
+        }
+
+        function handlePictureUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Check file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Image too large. Please choose an image under 2MB.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadedPictureData = e.target.result;
+                const preview = document.getElementById('profile-avatar-preview');
+                preview.style.backgroundImage = 'url(' + uploadedPictureData + ')';
+                preview.textContent = '';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveProfilePopup() {
+            const name = document.getElementById('popup-edit-name').value.trim();
+
+            if (!name) {
+                alert('Please enter a name');
+                return;
+            }
+
+            const updatedUser = {
+                ...currentUser,
+                name: name,
+                picture: uploadedPictureData || currentUser.picture
+            };
+
+            fetch('/set-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedUser)
+            }).then(() => {
+                currentUser = updatedUser;
+                localStorage.setItem('codiris_user', JSON.stringify(updatedUser));
+                updateUIForUser(updatedUser);
+                closeProfilePopup();
+            });
+        }
+
+        // Custom words functions
+        let customWords = {};
+
+        function loadCustomWords() {
+            fetch('/get-custom-words')
+                .then(res => res.json())
+                .then(data => {
+                    customWords = data.words || {};
+                    renderCustomWords();
+                });
+        }
+
+        function renderCustomWords() {
+            const container = document.getElementById('custom-words-list');
+            const entries = Object.entries(customWords);
+
+            if (entries.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center;">No custom words yet</p>';
+                return;
+            }
+
+            container.innerHTML = entries.map(([wrong, correct]) =>
+                `<div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee;">
+                    <span><strong>${wrong}</strong> → ${correct}</span>
+                    <button onclick="removeCustomWord('${wrong}')" style="background: none; border: none; color: #ff4444; cursor: pointer; font-size: 18px;">×</button>
+                </div>`
+            ).join('');
+        }
+
+        function addCustomWord() {
+            const wrongWord = document.getElementById('wrong-word').value.trim().toLowerCase();
+            const correctWord = document.getElementById('correct-word').value.trim();
+
+            if (!wrongWord || !correctWord) {
+                alert('Please fill in both fields');
+                return;
+            }
+
+            fetch('/add-custom-word', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ wrong: wrongWord, correct: correctWord })
+            }).then(() => {
+                customWords[wrongWord] = correctWord;
+                renderCustomWords();
+                document.getElementById('wrong-word').value = '';
+                document.getElementById('correct-word').value = '';
+            });
+        }
+
+        function removeCustomWord(wrongWord) {
+            fetch('/remove-custom-word', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ wrong: wrongWord })
+            }).then(() => {
+                delete customWords[wrongWord];
+                renderCustomWords();
+            });
+        }
+
+        function clearCustomWords() {
+            if (!confirm('Are you sure you want to clear all custom words?')) return;
+
+            fetch('/clear-custom-words', { method: 'POST' }).then(() => {
+                customWords = {};
+                renderCustomWords();
             });
         }
 
@@ -1656,7 +1974,7 @@ HTML_CONTENT = '''
                 } else if (data.state === 'processing') {
                     statusText.textContent = 'Processing your speech...';
                 } else {
-                    statusText.textContent = 'Ready - Hold fn key to start';
+                    statusText.textContent = 'Ready - Hold opt key to start';
                 }
 
                 // Update history
@@ -1688,6 +2006,31 @@ HTML_CONTENT = '''
             } catch (e) {}
         }, 500);
     </script>
+
+    <!-- Profile Popup -->
+    <div class="profile-popup" id="profile-popup" onclick="if(event.target === this) closeProfilePopup()">
+        <div class="profile-popup-content">
+            <h3>Edit Profile</h3>
+            <div class="profile-avatar-upload">
+                <div class="profile-avatar-preview" id="profile-avatar-preview">?</div>
+                <input type="file" id="profile-picture-input" accept="image/*" style="display: none;" onchange="handlePictureUpload(event)">
+                <button class="upload-btn" onclick="document.getElementById('profile-picture-input').click()">Upload Picture</button>
+            </div>
+            <div class="profile-field">
+                <label>Display Name</label>
+                <input type="text" id="popup-edit-name" placeholder="Your name">
+            </div>
+            <div class="profile-field">
+                <label>Email</label>
+                <input type="email" id="popup-edit-email" placeholder="your@email.com" disabled style="background: #f5f5f5;">
+            </div>
+            <div class="profile-actions">
+                <button class="profile-cancel" onclick="closeProfilePopup()">Cancel</button>
+                <button class="profile-save" onclick="saveProfilePopup()">Save Changes</button>
+            </div>
+            <button class="profile-signout" onclick="signOut(); closeProfilePopup();">Sign Out</button>
+        </div>
+    </div>
 </body>
 </html>
 '''
@@ -1931,6 +2274,50 @@ class WebUIHandler(http.server.SimpleHTTPRequestHandler):
                 'state': state,
                 'history': history
             }).encode())
+        elif self.path == '/get-custom-words':
+            # Get custom words from config
+            from voicetype.settings import load_config
+            config = load_config()
+            custom_words = config.get('custom_words', {})
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({'words': custom_words}).encode())
+        elif self.path == '/get-settings':
+            # Get all settings from config
+            from voicetype.settings import load_config
+            config = load_config()
+            # Return relevant settings (mask API keys partially for security in UI)
+            settings = {
+                'transcription_model': config.get('transcription_model', 'gpt4o'),
+                'groq_api_key': config.get('groq_api_key', ''),
+                'deepgram_api_key': config.get('deepgram_api_key', ''),
+                'assemblyai_api_key': config.get('assemblyai_api_key', ''),
+                'language': config.get('language', 'auto'),
+                'bar_position': config.get('bar_position', 'top'),
+                'bar_color': config.get('bar_color', '#FFFFFF')
+            }
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(settings).encode())
+        elif self.path == '/get-usage':
+            # Get usage statistics from config
+            from voicetype.settings import load_config
+            config = load_config()
+            usage_stats = config.get('usage_stats', {})
+            usage = {
+                'total_characters': usage_stats.get('total_characters', 0),
+                'total_requests': usage_stats.get('total_requests', 0),
+                'total_transcriptions': usage_stats.get('total_transcriptions', 0),
+                'month_transcriptions': usage_stats.get('month_transcriptions', 0),
+                'last_used': usage_stats.get('last_used', 'Never'),
+                'avg_daily': usage_stats.get('avg_daily', 0)
+            }
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(usage).encode())
         else:
             self.send_response(404)
             self.end_headers()
@@ -2038,6 +2425,48 @@ class WebUIHandler(http.server.SimpleHTTPRequestHandler):
             config = load_config()
             if 'user' in config:
                 del config['user']
+            save_config(config)
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({'success': True}).encode())
+        elif self.path == '/add-custom-word':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode())
+            wrong_word = data.get('wrong', '').strip().lower()
+            correct_word = data.get('correct', '').strip()
+            if wrong_word and correct_word:
+                from voicetype.settings import load_config, save_config
+                config = load_config()
+                if 'custom_words' not in config:
+                    config['custom_words'] = {}
+                config['custom_words'][wrong_word] = correct_word
+                save_config(config)
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({'success': True, 'words': config['custom_words']}).encode())
+            else:
+                self._send_error_response(400, 'Missing wrong or correct word')
+        elif self.path == '/remove-custom-word':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode())
+            wrong_word = data.get('wrong', '').strip().lower()
+            from voicetype.settings import load_config, save_config
+            config = load_config()
+            if 'custom_words' in config and wrong_word in config['custom_words']:
+                del config['custom_words'][wrong_word]
+                save_config(config)
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({'success': True, 'words': config.get('custom_words', {})}).encode())
+        elif self.path == '/clear-custom-words':
+            from voicetype.settings import load_config, save_config
+            config = load_config()
+            config['custom_words'] = {}
             save_config(config)
             self.send_response(200)
             self.send_header('Content-type', 'application/json')

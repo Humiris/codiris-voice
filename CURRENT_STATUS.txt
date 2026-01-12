@@ -1,0 +1,63 @@
+╔═══════════════════════════════════════════════════════════════╗
+║              CODIRIS VOICE - DEVELOPMENT STATUS               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+Last Updated: $(date)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SERVICES STATUS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Landing Page (Next.js)
+   URL:    http://localhost:3001
+   Status: RUNNING
+   Logs:   /tmp/nextjs.log
+
+✅ Desktop App (Python)
+   Status: RUNNING
+   PID:    55442
+   Logs:   /tmp/codiris_voice.log
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+QUICK ACCESS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Landing Page:
+  Homepage:       http://localhost:3001
+  Voice Demo:     http://localhost:3001/voice
+  Install Guide:  http://localhost:3001/install
+
+Desktop App:
+  Location:       Menu Bar (top right of screen)
+  Hotkey:         Hold Option key to record
+  Settings:       Menu Bar → "Settings & Usage"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NEW FEATURES READY TO TEST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Review Window (Desktop App)
+   - Side-by-side comparison
+   - 3 refinement styles
+   - Inline editing
+   - Accept & paste
+
+✅ Settings & Usage (Desktop App)
+   - Usage statistics tracking
+   - Affiliate program
+   - Floating bar customization
+
+✅ FAQ Section (Landing Page)
+   - 6 common questions
+   - Pricing info (FREE!)
+
+✅ Footer Update (Landing Page)
+   - Cluely-style design
+   - Social media links
+   - Resources/Support/Legal sections
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Sun Jan 11 04:38:02 CET 2026

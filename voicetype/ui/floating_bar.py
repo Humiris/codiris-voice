@@ -158,7 +158,26 @@ class WaveformBarView(NSView):
             self.wave_heights = [0.15] * 12
             self.time_val = 0.0
             self._drag_start = None
+            self.wave_color = (0.2, 0.5, 1.0)  # Default blue
+            self.idle_color = (0.7, 0.7, 0.7)  # Default gray
+            self._load_color()
         return self
+
+    def _load_color(self):
+        """Load wave color from settings"""
+        try:
+            from voicetype.settings import load_config
+            config = load_config()
+            hex_color = config.get('bar_color', '#3B82F6')
+            # Convert hex to RGB
+            hex_color = hex_color.lstrip('#')
+            r = int(hex_color[0:2], 16) / 255.0
+            g = int(hex_color[2:4], 16) / 255.0
+            b = int(hex_color[4:6], 16) / 255.0
+            self.wave_color = (r, g, b)
+            self.idle_color = (r * 0.7, g * 0.7, b * 0.7)  # Dimmer for idle
+        except Exception as e:
+            print(f"Error loading bar color: {e}")
 
     def mouseDown_(self, event):
         """Handle click on the floating bar"""
@@ -326,13 +345,15 @@ class WaveformBarView(NSView):
             bar_height = max(4, height_pct * max_height)
             y = center_y - bar_height / 2
 
-            # Color based on state
+            # Color based on state - use custom color
             if is_recording:
-                # Blue when recording
-                NSColor.colorWithCalibratedRed_green_blue_alpha_(0.2, 0.5, 1.0, 0.95).set()
+                # Full color when recording
+                r, g, b = self.wave_color
+                NSColor.colorWithCalibratedRed_green_blue_alpha_(r, g, b, 0.95).set()
             else:
-                # White/gray when idle
-                NSColor.colorWithCalibratedRed_green_blue_alpha_(0.7, 0.7, 0.7, 0.6).set()
+                # Dimmer when idle
+                r, g, b = self.idle_color
+                NSColor.colorWithCalibratedRed_green_blue_alpha_(r, g, b, 0.6).set()
 
             bar_rect = NSMakeRect(x, y, bar_width, bar_height)
             bar_path = NSBezierPath.bezierPathWithRoundedRect_xRadius_yRadius_(
@@ -359,6 +380,10 @@ class WaveformBarView(NSView):
 
         self.time_val += 0.05
         is_recording = _state["recording"]
+
+        # Reload color every ~3 seconds (every 100 frames at 0.03s interval)
+        if int(self.time_val * 33) % 100 == 0:
+            self._load_color()
 
         if is_recording:
             # Use real audio levels with smoothing

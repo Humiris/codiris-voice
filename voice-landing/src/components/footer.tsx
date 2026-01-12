@@ -1,80 +1,126 @@
 import React from "react";
-import { Linkedin, Mail, ArrowUpRight } from "lucide-react";
-import { motion } from "framer-motion";
+import { Linkedin, Mail } from "lucide-react";
 import Link from "next/link";
+
+const footerSections = [
+  {
+    title: "Resources",
+    links: [
+      { label: "Blog", href: "https://humiris.substack.com/" },
+      { label: "Demo", href: "https://www.codiris.build/demo" }
+    ]
+  },
+  {
+    title: "Support",
+    links: [
+      { label: "Help Center", href: "#" }
+    ]
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Privacy", href: "https://www.codiris.build/privacy-policy" },
+      { label: "Terms", href: "https://www.codiris.build/terms-of-service" }
+    ]
+  }
+];
+
 
 export const Footer = () => {
   return (
-    <footer className="bg-white pt-20 pb-12 px-4 sm:px-6 lg:px-8 border-t border-slate-100">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
-          <div>
-            <Link href="/" className="flex items-center gap-3 mb-8 group">
-              <div className="w-10 h-10 flex items-center justify-center bg-white rounded-xl shadow-lg shadow-blue-100/50 border border-slate-100 overflow-hidden">
+    <footer className="bg-[#f5f5f7] pt-16 pb-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-10 mb-12">
+          {/* Logo and Status */}
+          <div className="md:col-span-2">
+            <Link href="/" className="flex items-center gap-2.5 mb-5 group">
+              <div className="w-9 h-9 flex items-center justify-center bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <img
                   src="https://framerusercontent.com/images/6hd2q32TCQkqeTR6lgvTAQAClWE.svg?width=375&height=375"
                   alt="Codiris"
-                  className="w-7 h-7"
+                  className="w-6 h-6"
                 />
               </div>
-              <div className="flex flex-col -space-y-1">
-                <span className="text-2xl font-black tracking-tighter text-slate-900">
-                  Codiris
-                </span>
-                <span className="text-[10px] font-bold text-blue-500/60 uppercase tracking-[0.2em]">Voice</span>
-              </div>
+              <span className="text-lg font-bold tracking-tight text-slate-900">
+                Codiris Voice
+              </span>
             </Link>
-            <p className="text-slate-500 max-w-xs mb-8 font-medium leading-relaxed">
-              Building the Voice OS for the next generation of computing. Speak your mind, we'll do the rest.
-            </p>
-            <div className="flex gap-3">
-              <SocialIcon icon={Linkedin} href="https://www.linkedin.com/company/codirisbuild/" />
-              <SocialIcon icon={Mail} href="https://humiris.substack.com/" />
+
+            <div className="flex items-center gap-2 text-slate-500 text-sm">
+              <div className="w-2 h-2 bg-green-500 rounded-full" />
+              All systems operational
             </div>
           </div>
 
-          <div>
-            <h4 className="font-bold text-slate-900 mb-6 uppercase text-xs tracking-widest">Product</h4>
-            <FooterLink label="Download" href="/install" />
-            <FooterLink label="Try Voice AI" href="/voice" />
-          </div>
+          {/* Footer Links */}
+          {footerSections.map((section) => (
+            <div key={section.title}>
+              <h4 className="font-semibold text-slate-900 mb-4 text-sm">
+                {section.title}
+              </h4>
+              <ul className="space-y-3">
+                {section.links.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="text-slate-600 hover:text-slate-900 transition-colors text-sm"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        <div className="pt-12 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-8">
-          <p className="text-slate-400 text-sm font-medium">
-            © 2025 Codiris Intelligence Inc. All rights reserved.
+        {/* Bottom Bar */}
+        <div className="pt-6 border-t border-slate-200/60 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-slate-400 text-sm">
+            © 2025 Codiris Intelligence Inc.
           </p>
 
-          <div className="flex items-center gap-2 text-slate-400 text-sm font-bold">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            All systems operational
+          {/* Social Icons - dark navy like Cluely */}
+          <div className="flex items-center gap-2">
+            <a
+              href="https://twitter.com/codiris"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-8 h-8 rounded-full bg-[#1a1f36] hover:bg-[#2a2f46] text-white flex items-center justify-center transition-all"
+            >
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+            </a>
+            <a
+              href="https://www.linkedin.com/company/codirisbuild/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-8 h-8 rounded-full bg-[#1a1f36] hover:bg-[#2a2f46] text-white flex items-center justify-center transition-all"
+            >
+              <Linkedin className="w-3.5 h-3.5" />
+            </a>
+            <a
+              href="https://humiris.substack.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-8 h-8 rounded-full bg-[#1a1f36] hover:bg-[#2a2f46] text-white flex items-center justify-center transition-all"
+            >
+              <Mail className="w-3.5 h-3.5" />
+            </a>
+            <a
+              href="https://instagram.com/codiris"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-8 h-8 rounded-full bg-[#1a1f36] hover:bg-[#2a2f46] text-white flex items-center justify-center transition-all"
+            >
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2c2.717 0 3.056.01 4.122.06 1.065.05 1.79.217 2.428.465.66.254 1.216.598 1.772 1.153a4.908 4.908 0 0 1 1.153 1.772c.247.637.415 1.363.465 2.428.047 1.066.06 1.405.06 4.122 0 2.717-.01 3.056-.06 4.122-.05 1.065-.218 1.79-.465 2.428a4.883 4.883 0 0 1-1.153 1.772 4.915 4.915 0 0 1-1.772 1.153c-.637.247-1.363.415-2.428.465-1.066.047-1.405.06-4.122.06-2.717 0-3.056-.01-4.122-.06-1.065-.05-1.79-.218-2.428-.465a4.89 4.89 0 0 1-1.772-1.153 4.904 4.904 0 0 1-1.153-1.772c-.248-.637-.415-1.363-.465-2.428C2.013 15.056 2 14.717 2 12c0-2.717.01-3.056.06-4.122.05-1.066.217-1.79.465-2.428a4.88 4.88 0 0 1 1.153-1.772A4.897 4.897 0 0 1 5.45 2.525c.638-.248 1.362-.415 2.428-.465C8.944 2.013 9.283 2 12 2zm0 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-.25a1.25 1.25 0 0 0-2.5 0 1.25 1.25 0 0 0 2.5 0zM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
+              </svg>
+            </a>
           </div>
         </div>
       </div>
     </footer>
   );
-};
-
-const FooterLink = ({ label, href, isNew = false }: { label: string; href?: string; isNew?: boolean }) => (
-  <Link href={href || "#"} className="group flex items-center gap-2 text-slate-500 hover:text-blue-600 mb-4 transition-all duration-300 font-medium">
-    {label}
-    {isNew && (
-      <span className="px-1.5 py-0.5 rounded bg-blue-50 text-[10px] font-bold text-blue-600">New</span>
-    )}
-    <ArrowUpRight className="w-3 h-3 opacity-0 -translate-y-1 translate-x-1 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all" />
-  </Link>
-);
-
-const SocialIcon = ({ icon: Icon, href }: { icon: any; href?: string }) => {
-  const content = (
-    <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white hover:shadow-lg hover:shadow-blue-100 transition-all duration-300 cursor-pointer group">
-      <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
-    </div>
-  );
-
-  return href ? (
-    <a href={href} target="_blank" rel="noopener noreferrer">
-      {content}
-    </a>
-  ) : content;
 };

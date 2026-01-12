@@ -223,11 +223,11 @@ export function VoiceAI() {
       {/* Main Content */}
       <main className="relative z-10 flex-1 flex flex-col md:flex-row overflow-hidden">
         {/* Left Side: Interaction & Result */}
-        <div className="flex-1 flex flex-col p-6 md:p-12 overflow-y-auto">
-          <div className="max-w-4xl mx-auto w-full space-y-12">
+        <div className="flex-1 flex flex-col p-6 md:p-8 overflow-y-auto">
+          <div className="max-w-4xl mx-auto w-full space-y-6">
             
             {/* Visualizer & Control */}
-            <div className="flex flex-col items-center justify-center space-y-8">
+            <div className="flex flex-col items-center justify-center space-y-4">
               <div className="relative">
                 <motion.div
                   animate={{
@@ -235,57 +235,57 @@ export function VoiceAI() {
                     opacity: isListening ? [0.1, 0.2, 0.1] : 0.05
                   }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0 bg-slate-900 blur-[80px] rounded-full"
+                  className="absolute inset-0 bg-slate-900 blur-[60px] rounded-full"
                 />
 
-                <div className="relative w-48 h-48 rounded-full bg-white border-2 border-slate-200 flex items-center justify-center overflow-hidden shadow-xl">
-                  <div className="flex items-center gap-1 h-20">
+                <div className="relative w-32 h-32 rounded-full bg-white border-2 border-slate-200 flex items-center justify-center overflow-hidden shadow-xl">
+                  <div className="flex items-center gap-0.5 h-12">
                     {volume.map((v, i) => (
                       <motion.div
                         key={i}
-                        animate={{ height: v / 2 }}
+                        animate={{ height: v / 3 }}
                         transition={{ type: "spring", stiffness: 300, damping: 20 }}
                         className={cn(
-                          "w-1 rounded-full transition-colors duration-300",
+                          "w-0.5 rounded-full transition-colors duration-300",
                           isListening ? "bg-slate-900" : "bg-slate-300"
                         )}
                       />
                     ))}
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-14 h-14 rounded-full bg-slate-50 border-2 border-slate-200 flex items-center justify-center shadow-sm">
+                    <div className="w-10 h-10 rounded-full bg-slate-50 border-2 border-slate-200 flex items-center justify-center shadow-sm">
                       {isProcessing ? (
-                        <Loader2 className="w-6 h-6 text-slate-900 animate-spin" />
+                        <Loader2 className="w-4 h-4 text-slate-900 animate-spin" />
                       ) : (
-                        <AudioLines className={cn("w-6 h-6 transition-colors", isListening ? "text-slate-900" : "text-slate-400")} />
+                        <AudioLines className={cn("w-4 h-4 transition-colors", isListening ? "text-slate-900" : "text-slate-400")} />
                       )}
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="text-center space-y-2">
-                <h2 className="text-2xl font-bold text-slate-900">
+              <div className="text-center space-y-1">
+                <h2 className="text-lg font-bold text-slate-900">
                   {isListening ? "Listening..." : isProcessing ? "Transcribing your words..." : "Speak to Transcribe"}
                 </h2>
-                <p className="text-slate-500">We'll turn your spoken thoughts into clear text.</p>
+                <p className="text-sm text-slate-500">We'll turn your spoken thoughts into clear text.</p>
               </div>
 
               <button
                 onClick={isListening ? stopRecording : startRecording}
                 disabled={isProcessing}
                 className={cn(
-                  "group relative flex items-center gap-4 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 active:scale-95 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed shadow-lg",
+                  "group relative flex items-center gap-3 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 active:scale-95 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed shadow-lg",
                   isListening
                     ? "bg-red-50 border-2 border-red-200 text-red-600 hover:bg-red-100"
                     : "bg-slate-900 hover:bg-slate-800 text-white border-2 border-slate-900"
                 )}
               >
                 <div className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
+                  "w-6 h-6 rounded-full flex items-center justify-center transition-colors",
                   isListening ? "bg-red-100" : "bg-white/10"
                 )}>
-                  {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                  {isListening ? <MicOff className="w-3 h-3" /> : <Mic className="w-3 h-3" />}
                 </div>
                 <span>{isListening ? "Stop Recording" : "Start Talking"}</span>
               </button>
@@ -300,37 +300,6 @@ export function VoiceAI() {
                   exit={{ opacity: 0, y: -20 }}
                   className="space-y-6"
                 >
-                  {/* Refinement Style Selector */}
-                  <div className="space-y-3">
-                    <label className="text-xs font-bold uppercase tracking-widest text-slate-600 flex items-center gap-2">
-                      <Sparkles className="w-3 h-3" />
-                      Refinement Style
-                    </label>
-                    <div className="flex gap-2">
-                      {[
-                        { value: "professional", label: "Professional", desc: "Formal and clear" },
-                        { value: "casual", label: "Casual", desc: "Friendly tone" },
-                        { value: "concise", label: "Concise", desc: "Brief and direct" }
-                      ].map((style) => (
-                        <button
-                          key={style.value}
-                          onClick={() => handleRegenerateWithStyle(style.value as any)}
-                          disabled={isRegenerating}
-                          className={cn(
-                            "flex-1 px-4 py-3 rounded-xl border-2 transition-all text-left",
-                            refinementStyle === style.value
-                              ? "bg-slate-900 border-slate-900 text-white"
-                              : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300",
-                            isRegenerating && "opacity-50 cursor-not-allowed"
-                          )}
-                        >
-                          <div className="font-semibold text-sm">{style.label}</div>
-                          <div className="text-xs opacity-70">{style.desc}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
                   {/* View Mode Selector */}
                   <div className="flex items-center justify-center gap-2">
                     <button
@@ -527,6 +496,37 @@ export function VoiceAI() {
                       )}
                     </div>
                   )}
+
+                  {/* Refinement Style Selector - Moved Below Results */}
+                  <div className="space-y-3 pt-4">
+                    <label className="text-xs font-bold uppercase tracking-widest text-slate-600 flex items-center gap-2">
+                      <Sparkles className="w-3 h-3" />
+                      Refinement Style
+                    </label>
+                    <div className="flex gap-2">
+                      {[
+                        { value: "professional", label: "Professional", desc: "Formal and clear" },
+                        { value: "casual", label: "Casual", desc: "Friendly tone" },
+                        { value: "concise", label: "Concise", desc: "Brief and direct" }
+                      ].map((style) => (
+                        <button
+                          key={style.value}
+                          onClick={() => handleRegenerateWithStyle(style.value as any)}
+                          disabled={isRegenerating}
+                          className={cn(
+                            "flex-1 px-4 py-3 rounded-xl border-2 transition-all text-left",
+                            refinementStyle === style.value
+                              ? "bg-slate-900 border-slate-900 text-white"
+                              : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300",
+                            isRegenerating && "opacity-50 cursor-not-allowed"
+                          )}
+                        >
+                          <div className="font-semibold text-sm">{style.label}</div>
+                          <div className="text-xs opacity-70">{style.desc}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
