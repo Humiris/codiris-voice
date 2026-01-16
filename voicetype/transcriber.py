@@ -66,18 +66,58 @@ class Transcriber:
             self._loading_local = False
 
     def transcribe(self, file_path, language=None):
+        # Get raw transcription
         if self.model == "local":
-            return self._transcribe_local(file_path, language)
+            text = self._transcribe_local(file_path, language)
         elif self.model == "whisper":
-            return self._transcribe_whisper(file_path, language)
+            text = self._transcribe_whisper(file_path, language)
         elif self.model == "groq":
-            return self._transcribe_groq(file_path, language)
+            text = self._transcribe_groq(file_path, language)
         elif self.model == "deepgram":
-            return self._transcribe_deepgram(file_path, language)
+            text = self._transcribe_deepgram(file_path, language)
         elif self.model == "assemblyai":
-            return self._transcribe_assemblyai(file_path, language)
+            text = self._transcribe_assemblyai(file_path, language)
         else:  # Default to gpt4o
-            return self._transcribe_gpt4o(file_path, language)
+            text = self._transcribe_gpt4o(file_path, language)
+
+        # Apply learned corrections
+        text = self._apply_corrections(text)
+        return text
+
+    def _apply_corrections(self, text):
+        """Apply learned word corrections from training"""
+        try:
+            from voicetype.settings import load_config
+            config = load_config()
+            custom_words = config.get('custom_words', {})
+
+            if not custom_words:
+                return text
+
+            # Apply word-level corrections (case-insensitive matching)
+            words = text.split()
+            corrected_words = []
+
+            for word in words:
+                # Check the word (lowercase) against corrections
+                word_lower = word.lower()
+                # Strip punctuation for matching
+                word_clean = ''.join(c for c in word_lower if c.isalnum())
+
+                if word_clean in custom_words:
+                    # Preserve original punctuation
+                    correction = custom_words[word_clean]
+                    # Add back any trailing punctuation
+                    trailing_punct = ''.join(c for c in word if not c.isalnum())
+                    corrected_words.append(correction + trailing_punct)
+                else:
+                    corrected_words.append(word)
+
+            return ' '.join(corrected_words)
+
+        except Exception as e:
+            print(f"Error applying corrections: {e}")
+            return text
 
     def _transcribe_gpt4o(self, file_path, language=None):
         """Transcribe using GPT-4o audio capabilities - best quality"""

@@ -1347,11 +1347,47 @@ HTML_CONTENT = '''
 
         <!-- Training Page -->
         <div class="page" id="page-training">
-            <h2>Word Training</h2>
-            <p style="color: #666; margin-bottom: 30px;">Train custom words so Codiris Voice recognizes them correctly. When the AI transcribes a word incorrectly, add it here to fix it automatically.</p>
+            <h2>Voice Training</h2>
+            <p style="color: #666; margin-bottom: 30px;">Train Codiris Voice to recognize your words better. Speak, correct mistakes, and the AI learns from your corrections.</p>
 
+            <!-- Voice Training Section -->
+            <div class="settings-group" style="background: linear-gradient(135deg, #2f0df4 0%, #1a0a8c 100%); color: white; padding: 25px; border-radius: 16px; margin-bottom: 25px;">
+                <h4 style="color: white; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                    Voice Training Mode
+                </h4>
+                <p style="opacity: 0.9; margin-bottom: 20px; font-size: 14px;">Click the button, speak a word or phrase, then correct any mistakes. The AI will learn from your corrections.</p>
+
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <!-- Record Button -->
+                    <button id="training-record-btn" onclick="startTrainingRecord()" style="background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3); color: white; padding: 15px 30px; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s;">
+                        <svg id="training-mic-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                        <span id="training-btn-text">Click to Record</span>
+                    </button>
+
+                    <!-- Transcription Result -->
+                    <div id="training-result" style="display: none; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
+                        <div style="margin-bottom: 10px; font-size: 13px; opacity: 0.8;">AI heard:</div>
+                        <div id="training-transcription" style="font-size: 18px; font-weight: 600; margin-bottom: 15px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px;"></div>
+
+                        <div style="margin-bottom: 10px; font-size: 13px; opacity: 0.8;">Correct it (if needed):</div>
+                        <input type="text" id="training-correction" placeholder="Type the correct text here..." style="width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 16px; background: white; color: #333;">
+
+                        <div style="display: flex; gap: 10px; margin-top: 15px;">
+                            <button onclick="saveTrainingCorrection()" style="flex: 1; background: #10b981; border: none; color: white; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">
+                                Save Correction
+                            </button>
+                            <button onclick="skipTrainingCorrection()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">
+                                It's Correct
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manual Add Section -->
             <div class="settings-group">
-                <h4>Add New Word</h4>
+                <h4>Manual Word Training</h4>
                 <div class="setting-item" style="flex-direction: column; align-items: stretch; gap: 15px;">
                     <div style="display: flex; gap: 15px; align-items: center;">
                         <div style="flex: 1;">
@@ -1368,13 +1404,28 @@ HTML_CONTENT = '''
                 </div>
             </div>
 
+            <!-- Training Stats -->
+            <div class="settings-group" style="background: #f0f9ff; border: 1px solid #bae6fd;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4 style="margin: 0 0 5px 0; color: #0369a1;">Training Progress</h4>
+                        <p style="margin: 0; color: #0284c7; font-size: 13px;" id="training-stats-text">Loading...</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 32px; font-weight: 700; color: #0369a1;" id="training-count">0</div>
+                        <div style="font-size: 12px; color: #0284c7;">corrections learned</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trained Words List -->
             <div class="settings-group">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h4 style="margin: 0;">Trained Words</h4>
+                    <h4 style="margin: 0;">Learned Corrections</h4>
                     <button onclick="clearCustomWords()" style="background: #ff4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer;">Clear All</button>
                 </div>
                 <div id="custom-words-list" style="padding: 20px; background: #f8f8f8; border-radius: 12px; min-height: 150px;">
-                    <p style="color: #999; text-align: center;">No custom words yet</p>
+                    <p style="color: #999; text-align: center;">No corrections yet. Start voice training above!</p>
                 </div>
             </div>
         </div>
@@ -1955,7 +2006,179 @@ HTML_CONTENT = '''
             fetch('/clear-custom-words', { method: 'POST' }).then(() => {
                 customWords = {};
                 renderCustomWords();
+                updateTrainingStats();
             });
+        }
+
+        // Voice Training Functions
+        let trainingMediaRecorder = null;
+        let trainingAudioChunks = [];
+        let trainingIsRecording = false;
+        let currentTrainingTranscription = '';
+
+        function startTrainingRecord() {
+            if (trainingIsRecording) {
+                stopTrainingRecord();
+                return;
+            }
+
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    trainingMediaRecorder = new MediaRecorder(stream);
+                    trainingAudioChunks = [];
+
+                    trainingMediaRecorder.ondataavailable = (event) => {
+                        trainingAudioChunks.push(event.data);
+                    };
+
+                    trainingMediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(trainingAudioChunks, { type: 'audio/wav' });
+                        stream.getTracks().forEach(track => track.stop());
+                        await processTrainingAudio(audioBlob);
+                    };
+
+                    trainingMediaRecorder.start();
+                    trainingIsRecording = true;
+
+                    // Update UI
+                    document.getElementById('training-btn-text').textContent = 'Recording... Click to Stop';
+                    document.getElementById('training-record-btn').style.background = '#ef4444';
+                    document.getElementById('training-result').style.display = 'none';
+                })
+                .catch(err => {
+                    console.error('Microphone error:', err);
+                    alert('Could not access microphone');
+                });
+        }
+
+        function stopTrainingRecord() {
+            if (trainingMediaRecorder && trainingIsRecording) {
+                trainingMediaRecorder.stop();
+                trainingIsRecording = false;
+
+                document.getElementById('training-btn-text').textContent = 'Processing...';
+                document.getElementById('training-record-btn').style.background = 'rgba(255,255,255,0.2)';
+            }
+        }
+
+        async function processTrainingAudio(audioBlob) {
+            try {
+                const formData = new FormData();
+                formData.append('audio', audioBlob, 'training.wav');
+
+                const response = await fetch('/training-transcribe', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.text) {
+                    currentTrainingTranscription = data.text;
+                    document.getElementById('training-transcription').textContent = data.text;
+                    document.getElementById('training-correction').value = data.text;
+                    document.getElementById('training-result').style.display = 'block';
+                } else {
+                    alert('Could not transcribe audio. Please try again.');
+                }
+
+                document.getElementById('training-btn-text').textContent = 'Click to Record';
+            } catch (err) {
+                console.error('Training transcription error:', err);
+                document.getElementById('training-btn-text').textContent = 'Click to Record';
+                alert('Error processing audio');
+            }
+        }
+
+        function saveTrainingCorrection() {
+            const original = currentTrainingTranscription.trim().toLowerCase();
+            const correction = document.getElementById('training-correction').value.trim();
+
+            if (!original || !correction) {
+                alert('Please provide both the original and corrected text');
+                return;
+            }
+
+            // If they're the same, no need to save
+            if (original === correction.toLowerCase()) {
+                skipTrainingCorrection();
+                return;
+            }
+
+            // Extract individual word corrections
+            const originalWords = original.split(/\\s+/);
+            const correctionWords = correction.split(/\\s+/);
+
+            // Save full phrase correction
+            fetch('/add-training-correction', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    original: original,
+                    correction: correction,
+                    type: 'phrase'
+                })
+            }).then(() => {
+                // Also extract word-level corrections if lengths match
+                if (originalWords.length === correctionWords.length) {
+                    for (let i = 0; i < originalWords.length; i++) {
+                        if (originalWords[i] !== correctionWords[i].toLowerCase()) {
+                            fetch('/add-custom-word', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    wrong: originalWords[i],
+                                    correct: correctionWords[i]
+                                })
+                            });
+                            customWords[originalWords[i]] = correctionWords[i];
+                        }
+                    }
+                }
+
+                renderCustomWords();
+                updateTrainingStats();
+
+                // Reset UI
+                document.getElementById('training-result').style.display = 'none';
+                currentTrainingTranscription = '';
+
+                // Show success feedback
+                const btn = document.getElementById('training-record-btn');
+                btn.style.background = '#10b981';
+                document.getElementById('training-btn-text').textContent = 'Saved! Click to Record Again';
+                setTimeout(() => {
+                    btn.style.background = 'rgba(255,255,255,0.2)';
+                    document.getElementById('training-btn-text').textContent = 'Click to Record';
+                }, 2000);
+            });
+        }
+
+        function skipTrainingCorrection() {
+            document.getElementById('training-result').style.display = 'none';
+            currentTrainingTranscription = '';
+            document.getElementById('training-btn-text').textContent = 'Click to Record';
+        }
+
+        function updateTrainingStats() {
+            const count = Object.keys(customWords).length;
+            document.getElementById('training-count').textContent = count;
+
+            if (count === 0) {
+                document.getElementById('training-stats-text').textContent = 'Start training to improve accuracy';
+            } else if (count < 5) {
+                document.getElementById('training-stats-text').textContent = 'Good start! Keep adding corrections';
+            } else if (count < 20) {
+                document.getElementById('training-stats-text').textContent = 'Nice progress! AI is learning your vocabulary';
+            } else {
+                document.getElementById('training-stats-text').textContent = 'Excellent! AI is well-trained on your words';
+            }
+        }
+
+        // Update stats on page load
+        function initTrainingPage() {
+            loadCustomWords();
+            setTimeout(updateTrainingStats, 500);
         }
 
         // Poll status every 500ms
@@ -2467,11 +2690,109 @@ class WebUIHandler(http.server.SimpleHTTPRequestHandler):
             from voicetype.settings import load_config, save_config
             config = load_config()
             config['custom_words'] = {}
+            config['training_corrections'] = []
             save_config(config)
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps({'success': True}).encode())
+        elif self.path == '/training-transcribe':
+            # Handle audio upload for training
+            import tempfile
+            import os
+
+            content_type = self.headers.get('Content-Type', '')
+            if 'multipart/form-data' in content_type:
+                # Parse multipart form data
+                boundary = content_type.split('boundary=')[1]
+                content_length = int(self.headers['Content-Length'])
+                body = self.rfile.read(content_length)
+
+                # Simple multipart parsing - extract audio data
+                parts = body.split(f'--{boundary}'.encode())
+                audio_data = None
+                for part in parts:
+                    if b'name="audio"' in part:
+                        # Find the actual data after headers
+                        header_end = part.find(b'\r\n\r\n')
+                        if header_end != -1:
+                            audio_data = part[header_end + 4:]
+                            # Remove trailing boundary markers
+                            if audio_data.endswith(b'\r\n'):
+                                audio_data = audio_data[:-2]
+                            if audio_data.endswith(b'--'):
+                                audio_data = audio_data[:-2]
+                            if audio_data.endswith(b'\r\n'):
+                                audio_data = audio_data[:-2]
+
+                if audio_data:
+                    # Save to temp file and transcribe
+                    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as f:
+                        f.write(audio_data)
+                        temp_path = f.name
+
+                    try:
+                        # Use the transcriber to transcribe
+                        from voicetype.transcriber import Transcriber
+                        from voicetype.settings import load_config
+                        config = load_config()
+                        api_key = config.get('api_key', '')
+                        model = config.get('model', 'gpt4o')
+
+                        transcriber = Transcriber(api_key=api_key, model=model)
+                        text = transcriber.transcribe(temp_path)
+
+                        os.unlink(temp_path)
+
+                        self.send_response(200)
+                        self.send_header('Content-type', 'application/json')
+                        self.end_headers()
+                        self.wfile.write(json.dumps({'success': True, 'text': text}).encode())
+                    except Exception as e:
+                        if os.path.exists(temp_path):
+                            os.unlink(temp_path)
+                        self._send_error_response(500, str(e))
+                else:
+                    self._send_error_response(400, 'No audio data found')
+            else:
+                self._send_error_response(400, 'Invalid content type')
+        elif self.path == '/add-training-correction':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode())
+            original = data.get('original', '').strip()
+            correction = data.get('correction', '').strip()
+            correction_type = data.get('type', 'word')
+
+            if original and correction:
+                from voicetype.settings import load_config, save_config
+                from datetime import datetime
+                config = load_config()
+
+                if 'training_corrections' not in config:
+                    config['training_corrections'] = []
+
+                # Add the correction with metadata
+                config['training_corrections'].append({
+                    'original': original,
+                    'correction': correction,
+                    'type': correction_type,
+                    'timestamp': datetime.now().isoformat(),
+                    'count': 1
+                })
+
+                # Keep only last 500 corrections
+                if len(config['training_corrections']) > 500:
+                    config['training_corrections'] = config['training_corrections'][-500:]
+
+                save_config(config)
+
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({'success': True}).encode())
+            else:
+                self._send_error_response(400, 'Missing original or correction')
         else:
             self.send_response(404)
             self.end_headers()
