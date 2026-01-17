@@ -20,6 +20,7 @@ const AppleIcon = () => (
 const menuItems = [
   { label: "Home", href: "/" },
   { label: "Try Voice AI", href: "/voice" },
+  { label: "Pricing", href: "/pricing" },
   { label: "Download", href: "/install" },
 ];
 
