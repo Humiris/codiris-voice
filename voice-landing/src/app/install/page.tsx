@@ -26,7 +26,7 @@ export default function InstallPage() {
             <p className="text-xl text-slate-600 mb-6">
               Get Codiris Voice up and running in minutes
             </p>
-            <a href="https://github.com/Humiris/codiris-voice/releases/latest/download/Codiris-Voice.dmg">
+            <a href="https://github.com/Humiris/codiris-voice/releases/latest/download/Codiris.Voice.dmg">
               <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95">
                 <Download className="w-5 h-5 inline-block mr-2" />
                 Download Codiris Voice.dmg
@@ -39,20 +39,20 @@ export default function InstallPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="bg-white border-2 border-slate-200 rounded-2xl p-8 mb-8 shadow-sm"
+            className="bg-white border-2 border-green-200 rounded-2xl p-8 mb-8 shadow-sm"
           >
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                <AlertCircle className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                <CheckCircle2 className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">Not Apple-Signed</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Apple Notarized</h3>
                 <p className="text-slate-600 mb-2">
-                  Codiris Voice is not signed with an Apple Developer certificate.
-                  You'll see a security warning when opening it for the first time.
+                  Codiris Voice is signed and notarized by Apple for your security.
+                  It will install smoothly without security warnings.
                 </p>
                 <p className="text-slate-500 text-sm">
-                  Follow the steps below to install safely on your Mac.
+                  14-day free trial included. No credit card required.
                 </p>
               </div>
             </div>
@@ -86,45 +86,6 @@ export default function InstallPage() {
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200"
-            >
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-5 h-5 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">Step 2: Bypass Security Warning</h3>
-                  <p className="text-slate-600 mb-3">
-                    When you first open Codiris Voice, macOS will block it with a warning:
-                  </p>
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-3">
-                    <p className="text-sm text-slate-700 italic">
-                      "Codiris Voice.app cannot be opened because it is from an unidentified developer"
-                    </p>
-                  </div>
-                  <p className="font-semibold text-slate-900 mb-2">To bypass this:</p>
-                  <ol className="space-y-2 text-slate-600">
-                    <li className="flex items-start gap-2">
-                      <span className="font-semibold">Option A:</span>
-                      <span>Right-click the app → Click "Open" → Click "Open" again in the dialog</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="font-semibold">Option B:</span>
-                      <span>
-                        Go to System Settings → Privacy & Security → Scroll down →
-                        Click "Open Anyway" next to the Codiris Voice message
-                      </span>
-                    </li>
-                  </ol>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Step 3 */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
               className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200"
             >
@@ -133,7 +94,7 @@ export default function InstallPage() {
                   <Mic className="w-5 h-5 text-blue-600" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">Step 3: Grant Microphone Permission</h3>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Step 2: Grant Microphone Permission</h3>
                   <p className="text-slate-600 mb-3">
                     Codiris Voice needs microphone access to transcribe your speech:
                   </p>
@@ -158,7 +119,7 @@ export default function InstallPage() {
                   <Settings className="w-5 h-5 text-blue-600" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">Step 4: Grant Input Monitoring Permission</h3>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Step 3: Grant Input Monitoring Permission</h3>
                   <p className="text-slate-600 mb-3">
                     Codiris Voice needs input monitoring to detect the Option key:
                   </p>
@@ -183,7 +144,7 @@ export default function InstallPage() {
                   <Settings className="w-5 h-5 text-blue-600" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">Step 5: Grant Accessibility Permission</h3>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Step 4: Grant Accessibility Permission</h3>
                   <p className="text-slate-600 mb-3">
                     Codiris Voice needs accessibility access to type transcribed text:
                   </p>
