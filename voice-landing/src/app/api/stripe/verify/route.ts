@@ -48,27 +48,27 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      const subscription = trialingSubscriptions.data[0];
+      const subscription = trialingSubscriptions.data[0] as any;
       return NextResponse.json({
         isPremium: true,
         subscription: {
           id: subscription.id,
           status: subscription.status,
-          currentPeriodEnd: subscription.currentPeriodEnd,
-          cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+          currentPeriodEnd: subscription.current_period_end || subscription.currentPeriodEnd,
+          cancelAtPeriodEnd: subscription.cancel_at_period_end || subscription.cancelAtPeriodEnd,
         },
       });
     }
 
-    const subscription = subscriptions.data[0];
+    const subscription = subscriptions.data[0] as any;
 
     return NextResponse.json({
       isPremium: true,
       subscription: {
         id: subscription.id,
         status: subscription.status,
-        currentPeriodEnd: subscription.currentPeriodEnd,
-        cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+        currentPeriodEnd: subscription.current_period_end || subscription.currentPeriodEnd,
+        cancelAtPeriodEnd: subscription.cancel_at_period_end || subscription.cancelAtPeriodEnd,
       },
     });
   } catch (error: any) {
