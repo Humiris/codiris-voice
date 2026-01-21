@@ -4,6 +4,11 @@ import threading
 import base64
 import requests
 
+# Timeout for API calls (in seconds)
+API_TIMEOUT = 60
+# Maximum file size for APIs (in bytes) - 25MB for OpenAI
+MAX_FILE_SIZE = 25 * 1024 * 1024
+
 class Transcriber:
     # Built-in API keys
     GROQ_API_KEY = "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"
@@ -66,19 +71,31 @@ class Transcriber:
             self._loading_local = False
 
     def transcribe(self, file_path, language=None):
+        # Check file size
+        file_size = os.path.getsize(file_path)
+        print(f"[Transcribe] File size: {file_size / 1024:.1f} KB")
+
+        if file_size > MAX_FILE_SIZE:
+            print(f"[Transcribe] WARNING: File too large ({file_size / 1024 / 1024:.1f} MB), may fail")
+
         # Get raw transcription
-        if self.model == "local":
-            text = self._transcribe_local(file_path, language)
-        elif self.model == "whisper":
-            text = self._transcribe_whisper(file_path, language)
-        elif self.model == "groq":
-            text = self._transcribe_groq(file_path, language)
-        elif self.model == "deepgram":
-            text = self._transcribe_deepgram(file_path, language)
-        elif self.model == "assemblyai":
-            text = self._transcribe_assemblyai(file_path, language)
-        else:  # Default to gpt4o
-            text = self._transcribe_gpt4o(file_path, language)
+        try:
+            if self.model == "local":
+                text = self._transcribe_local(file_path, language)
+            elif self.model == "whisper":
+                text = self._transcribe_whisper(file_path, language)
+            elif self.model == "groq":
+                text = self._transcribe_groq(file_path, language)
+            elif self.model == "deepgram":
+                text = self._transcribe_deepgram(file_path, language)
+            elif self.model == "assemblyai":
+                text = self._transcribe_assemblyai(file_path, language)
+            else:  # Default to gpt4o
+                text = self._transcribe_gpt4o(file_path, language)
+        except requests.exceptions.Timeout:
+            raise Exception("Transcription timed out. Try a shorter recording.")
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Network error during transcription: {str(e)}")
 
         # Apply learned corrections
         text = self._apply_corrections(text)
@@ -143,6 +160,7 @@ class Transcriber:
         response = self.client.chat.completions.create(
             model="gpt-4o-audio-preview",
             modalities=["text"],
+            timeout=API_TIMEOUT,
             messages=[
                 {
                     "role": "user",
@@ -197,7 +215,7 @@ class Transcriber:
             if language and language != "auto":
                 data["language"] = language
 
-            response = requests.post(url, headers=headers, files=files, data=data)
+            response = requests.post(url, headers=headers, files=files, data=data, timeout=API_TIMEOUT)
 
         if response.status_code != 200:
             raise Exception(f"Groq API error: {response.text}")
@@ -229,7 +247,7 @@ class Transcriber:
         }
 
         with open(file_path, "rb") as audio_file:
-            response = requests.post(url, headers=headers, params=params, data=audio_file)
+            response = requests.post(url, headers=headers, params=params, data=audio_file, timeout=API_TIMEOUT)
 
         if response.status_code != 200:
             raise Exception(f"Deepgram API error: {response.text}")
@@ -255,7 +273,7 @@ class Transcriber:
         # Step 1: Upload the audio file
         upload_url = "https://api.assemblyai.com/v2/upload"
         with open(file_path, "rb") as audio_file:
-            upload_response = requests.post(upload_url, headers=headers, data=audio_file)
+            upload_response = requests.post(upload_url, headers=headers, data=audio_file, timeout=API_TIMEOUT)
 
         if upload_response.status_code != 200:
             raise Exception(f"AssemblyAI upload error: {upload_response.text}")
@@ -271,7 +289,8 @@ class Transcriber:
         transcript_response = requests.post(
             transcript_url,
             headers=headers,
-            json=transcript_request
+            json=transcript_request,
+            timeout=API_TIMEOUT
         )
 
         if transcript_response.status_code != 200:
@@ -279,10 +298,12 @@ class Transcriber:
 
         transcript_id = transcript_response.json()["id"]
 
-        # Step 3: Poll for completion
+        # Step 3: Poll for completion (with timeout)
         polling_url = f"https://api.assemblyai.com/v2/transcript/{transcript_id}"
-        while True:
-            poll_response = requests.get(polling_url, headers=headers)
+        import time
+        start_time = time.time()
+        while time.time() - start_time < API_TIMEOUT:
+            poll_response = requests.get(polling_url, headers=headers, timeout=30)
             result = poll_response.json()
 
             if result["status"] == "completed":
@@ -290,8 +311,9 @@ class Transcriber:
             elif result["status"] == "error":
                 raise Exception(f"AssemblyAI transcription failed: {result.get('error', 'Unknown error')}")
 
-            import time
             time.sleep(0.5)
+
+        raise Exception("AssemblyAI transcription timed out")
 
     def _transcribe_local(self, file_path, language=None):
         """Transcribe using local Whisper base model - offline/private"""

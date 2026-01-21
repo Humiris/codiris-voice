@@ -1,4 +1,4 @@
-# How to Create an Apple Developer Account
+                                                                    # How to Create an Apple Developer Account
 
 To distribute your macOS app to others without the "Malware" warning, you need to enroll in the Apple Developer Program.
 

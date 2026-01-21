@@ -1103,6 +1103,10 @@ HTML_CONTENT = '''
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                 Word Training
             </div>
+            <div class="nav-item" onclick="showPage('subscription')">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                Subscription
+            </div>
             <div class="nav-item" onclick="showPage('settings')">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 Settings
@@ -1245,6 +1249,117 @@ HTML_CONTENT = '''
                 <div class="history-list" id="fullHistory">
                     <p class="empty-history">Your transcriptions will appear here...</p>
                 </div>
+            </div>
+        </div>
+
+        <!-- Subscription Page -->
+        <div class="page" id="page-subscription">
+            <div class="page-header">
+                <h2>Subscription</h2>
+                <p>Manage your Codiris Voice plan</p>
+            </div>
+
+            <!-- Trial/Subscription Status Banner -->
+            <div class="section-card" id="subscription-status" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 id="plan-title" style="font-size: 24px; margin-bottom: 8px;">Free Trial</h3>
+                        <p id="plan-desc" style="opacity: 0.9;">14 days remaining</p>
+                    </div>
+                    <div id="plan-badge" style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; font-weight: 600;">
+                        TRIAL
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing Cards -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                <!-- Free Trial Card -->
+                <div class="section-card" style="border: 2px solid #e0e0e0;">
+                    <h3 style="font-size: 20px; margin-bottom: 8px;">Free Trial</h3>
+                    <p style="color: #666; margin-bottom: 16px;">Try everything free</p>
+                    <div style="font-size: 36px; font-weight: 700; margin-bottom: 16px;">$0 <span style="font-size: 16px; color: #666; font-weight: 400;">/ 14 days</span></div>
+                    <ul style="list-style: none; margin-bottom: 20px;">
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;">
+                            <svg width="16" height="16" fill="none" stroke="#22c55e" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            Unlimited transcriptions
+                        </li>
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;">
+                            <svg width="16" height="16" fill="none" stroke="#22c55e" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            All AI enhancement modes
+                        </li>
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;">
+                            <svg width="16" height="16" fill="none" stroke="#22c55e" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            History & statistics
+                        </li>
+                    </ul>
+                    <button id="trial-btn" style="width: 100%; padding: 12px; background: #f0f0f0; border: none; border-radius: 8px; font-weight: 600; color: #666; cursor: default;">
+                        Current Plan
+                    </button>
+                </div>
+
+                <!-- Pro Card -->
+                <div class="section-card" style="border: 2px solid #2f0df4; background: linear-gradient(to bottom, #fafbff, white);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h3 style="font-size: 20px;">Pro</h3>
+                        <span style="background: #2f0df4; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">RECOMMENDED</span>
+                    </div>
+                    <p style="color: #666; margin-bottom: 16px;">For power users</p>
+                    <div style="font-size: 36px; font-weight: 700; margin-bottom: 16px;">$9.99 <span style="font-size: 16px; color: #666; font-weight: 400;">/ month</span></div>
+                    <ul style="list-style: none; margin-bottom: 20px;">
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;">
+                            <svg width="16" height="16" fill="none" stroke="#22c55e" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            Unlimited transcriptions
+                        </li>
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;">
+                            <svg width="16" height="16" fill="none" stroke="#22c55e" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            All AI enhancement modes
+                        </li>
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;">
+                            <svg width="16" height="16" fill="none" stroke="#22c55e" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            Priority processing
+                        </li>
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;">
+                            <svg width="16" height="16" fill="none" stroke="#22c55e" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            Email support
+                        </li>
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;">
+                            <svg width="16" height="16" fill="none" stroke="#22c55e" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            Cancel anytime
+                        </li>
+                    </ul>
+                    <button id="upgrade-btn" onclick="openUpgradeModal()" style="width: 100%; padding: 12px; background: #2f0df4; border: none; border-radius: 8px; font-weight: 600; color: white; cursor: pointer; transition: background 0.2s;">
+                        Upgrade to Pro
+                    </button>
+                </div>
+            </div>
+
+            <!-- Email Input for Subscription Verification -->
+            <div class="section-card" style="margin-top: 20px;">
+                <h3 style="margin-bottom: 12px;">Already subscribed?</h3>
+                <p style="color: #666; margin-bottom: 16px;">Enter your email to verify your subscription status.</p>
+                <div style="display: flex; gap: 12px;">
+                    <input type="email" id="verify-email" placeholder="Enter your email" style="flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                    <button onclick="verifySubscription()" style="padding: 12px 24px; background: #1a1a1a; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                        Verify
+                    </button>
+                </div>
+                <p id="verify-result" style="margin-top: 12px; display: none;"></p>
+            </div>
+        </div>
+
+        <!-- Upgrade Modal -->
+        <div id="upgrade-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+            <div style="background: white; border-radius: 16px; padding: 32px; max-width: 400px; width: 90%; text-align: center;">
+                <h2 style="margin-bottom: 8px;">Upgrade to Pro</h2>
+                <p style="color: #666; margin-bottom: 24px;">Enter your email to continue to checkout</p>
+                <input type="email" id="checkout-email" placeholder="your@email.com" style="width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; margin-bottom: 16px;">
+                <button onclick="startCheckout()" id="checkout-btn" style="width: 100%; padding: 14px; background: #2f0df4; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 16px; cursor: pointer; margin-bottom: 12px;">
+                    Continue to Payment
+                </button>
+                <button onclick="closeUpgradeModal()" style="width: 100%; padding: 12px; background: transparent; border: none; color: #666; cursor: pointer;">
+                    Cancel
+                </button>
             </div>
         </div>
 
@@ -2228,6 +2343,132 @@ HTML_CONTENT = '''
                 }
             } catch (e) {}
         }, 500);
+
+        // Subscription Functions
+        const API_BASE = 'https://voice.codiris.build';
+
+        function openUpgradeModal() {
+            document.getElementById('upgrade-modal').style.display = 'flex';
+        }
+
+        function closeUpgradeModal() {
+            document.getElementById('upgrade-modal').style.display = 'none';
+        }
+
+        async function startCheckout() {
+            const email = document.getElementById('checkout-email').value.trim();
+            if (!email) {
+                alert('Please enter your email');
+                return;
+            }
+
+            const btn = document.getElementById('checkout-btn');
+            btn.textContent = 'Loading...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(API_BASE + '/api/stripe/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+
+                if (data.url) {
+                    window.open(data.url, '_blank');
+                    closeUpgradeModal();
+                } else {
+                    alert('Error: ' + (data.error || 'Could not start checkout'));
+                }
+            } catch (error) {
+                alert('Connection error. Please try again.');
+            } finally {
+                btn.textContent = 'Continue to Payment';
+                btn.disabled = false;
+            }
+        }
+
+        async function verifySubscription() {
+            const email = document.getElementById('verify-email').value.trim();
+            if (!email) {
+                alert('Please enter your email');
+                return;
+            }
+
+            const resultEl = document.getElementById('verify-result');
+            resultEl.style.display = 'block';
+            resultEl.textContent = 'Verifying...';
+            resultEl.style.color = '#666';
+
+            try {
+                const response = await fetch(API_BASE + '/api/stripe/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+
+                if (data.isPremium) {
+                    resultEl.textContent = '✓ Pro subscription verified! Refreshing...';
+                    resultEl.style.color = '#22c55e';
+                    updateSubscriptionUI(true, email);
+                    // Save email locally
+                    localStorage.setItem('codiris_email', email);
+                } else {
+                    resultEl.textContent = '✗ No active subscription found for this email.';
+                    resultEl.style.color = '#ef4444';
+                }
+            } catch (error) {
+                resultEl.textContent = 'Connection error. Please try again.';
+                resultEl.style.color = '#ef4444';
+            }
+        }
+
+        function updateSubscriptionUI(isPremium, email) {
+            const statusEl = document.getElementById('subscription-status');
+            const titleEl = document.getElementById('plan-title');
+            const descEl = document.getElementById('plan-desc');
+            const badgeEl = document.getElementById('plan-badge');
+            const trialBtn = document.getElementById('trial-btn');
+            const upgradeBtn = document.getElementById('upgrade-btn');
+
+            if (isPremium) {
+                statusEl.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+                titleEl.textContent = 'Pro Plan';
+                descEl.textContent = email || 'Active subscription';
+                badgeEl.textContent = 'PRO';
+                trialBtn.textContent = 'Free Trial';
+                trialBtn.style.background = '#f0f0f0';
+                trialBtn.style.color = '#666';
+                upgradeBtn.textContent = '✓ Current Plan';
+                upgradeBtn.style.background = '#22c55e';
+                upgradeBtn.onclick = null;
+                upgradeBtn.style.cursor = 'default';
+            }
+        }
+
+        // Check saved subscription on load
+        (function checkSavedSubscription() {
+            const savedEmail = localStorage.getItem('codiris_email');
+            if (savedEmail) {
+                document.getElementById('verify-email').value = savedEmail;
+                // Auto-verify silently
+                fetch(API_BASE + '/api/stripe/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: savedEmail })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.isPremium) {
+                        updateSubscriptionUI(true, savedEmail);
+                    }
+                })
+                .catch(() => {});
+            }
+        })();
     </script>
 
     <!-- Profile Popup -->
