@@ -13,6 +13,10 @@ is_processing = False
 current_user = None
 pending_oauth_user = None
 
+# Update info
+update_available = None
+update_notes = None
+
 HTML_CONTENT = '''
 <!DOCTYPE html>
 <html lang="en">
@@ -398,6 +402,50 @@ HTML_CONTENT = '''
             width: 20px;
             height: 20px;
         }
+        /* Update Banner */
+        .update-banner {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: updatePulse 2s ease-in-out infinite;
+        }
+        @keyframes updatePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+        }
+        .update-icon {
+            color: white;
+            flex-shrink: 0;
+        }
+        .update-text {
+            flex: 1;
+            color: white;
+            font-size: 12px;
+            line-height: 1.3;
+        }
+        .update-text strong {
+            display: block;
+            font-size: 13px;
+        }
+        .update-btn {
+            background: white;
+            color: #059669;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .update-btn:hover {
+            transform: scale(1.05);
+        }
+
         .user-section {
             border-top: 1px solid rgba(255,255,255,0.1);
             padding-top: 20px;
@@ -1112,6 +1160,18 @@ HTML_CONTENT = '''
                 Settings
             </div>
         </nav>
+
+        <!-- Update Banner -->
+        <div class="update-banner" id="update-banner" style="display: none;">
+            <div class="update-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            </div>
+            <div class="update-text">
+                <strong>Update Available</strong>
+                <span id="update-version"></span>
+            </div>
+            <button class="update-btn" onclick="downloadUpdate()">Update</button>
+        </div>
 
         <div class="user-section">
             <div class="user-info" id="sidebar-user" onclick="openProfilePopup()">
@@ -2344,6 +2404,35 @@ HTML_CONTENT = '''
             } catch (e) {}
         }, 500);
 
+        // Update Functions
+        function showUpdateBanner(version) {
+            const banner = document.getElementById('update-banner');
+            const versionSpan = document.getElementById('update-version');
+            if (banner && version) {
+                versionSpan.textContent = 'v' + version + ' is ready';
+                banner.style.display = 'flex';
+            }
+        }
+
+        function downloadUpdate() {
+            window.open('https://github.com/Humiris/codiris-voice/releases/latest', '_blank');
+        }
+
+        // Check for updates on load
+        function checkForUpdates() {
+            fetch('/api/check-update')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.update_available) {
+                        showUpdateBanner(data.latest_version);
+                    }
+                })
+                .catch(() => {});
+        }
+
+        // Check for updates after page loads
+        setTimeout(checkForUpdates, 2000);
+
         // Subscription Functions
         const API_BASE = 'https://voice.codiris.build';
 
@@ -2725,6 +2814,17 @@ class WebUIHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({'user': user}).encode())
             else:
                 self.wfile.write(json.dumps({'user': None}).encode())
+        elif self.path == '/api/check-update':
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self._add_security_headers()
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                'update_available': update_available is not None,
+                'latest_version': update_available,
+                'current_version': '1.0.2',
+                'notes': update_notes
+            }).encode())
         elif self.path == '/status':
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
@@ -3073,6 +3173,13 @@ def start_server():
 
 def open_ui():
     webbrowser.open(f'http://localhost:{PORT}')
+
+
+def set_update_available(version, notes=None):
+    """Set update available notification"""
+    global update_available, update_notes
+    update_available = version
+    update_notes = notes
 
 
 def start_web_ui():

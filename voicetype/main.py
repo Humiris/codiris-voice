@@ -9,7 +9,7 @@ from voicetype.text_injector import TextInjector
 from voicetype.ai_enhancer import AIEnhancer
 from voicetype.hotkey_listener import HotkeyListener
 from voicetype.settings import load_config, save_config
-from voicetype.ui.web_ui import start_web_ui, add_to_history, set_recording, set_processing
+from voicetype.ui.web_ui import start_web_ui, add_to_history, set_recording, set_processing, set_update_available
 from voicetype.ui.floating_bar import show_recording_bar, show_processing_bar, show_idle_bar, set_click_callback, set_stop_callback, set_settings_callback
 from voicetype.ui.dashboard_window import show_dashboard
 from voicetype.ui.review_window import show_review
@@ -117,6 +117,22 @@ class VoiceTypeApp(rumps.App):
         # Timer to check for pending hotkey events (runs on main thread)
         self.timer = rumps.Timer(self._check_pending, 0.05)
         self.timer.start()
+
+        # Check for updates in background
+        self._check_for_updates()
+
+    def _check_for_updates(self):
+        """Check for updates in background thread"""
+        def check():
+            try:
+                from voicetype.updater import check_for_updates, get_latest_version, get_release_notes
+                result = check_for_updates(silent=True)
+                if result:
+                    set_update_available(result, get_release_notes())
+                    print(f"[Main] Update available: v{result}")
+            except Exception as e:
+                print(f"[Main] Update check failed: {e}")
+        threading.Thread(target=check, daemon=True).start()
 
     def _queue_press(self):
         print("[Main] Hotkey PRESS detected, queueing action")
