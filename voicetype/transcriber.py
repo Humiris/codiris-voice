@@ -153,9 +153,9 @@ class Transcriber:
         }
         audio_format = format_map.get(file_ext, "wav")
 
-        prompt = "Transcribe this audio exactly as spoken. Return only the transcription, nothing else."
+        prompt = "Transcribe this audio exactly as spoken. Return only the transcription, nothing else. If the audio is unclear or silent, return an empty string."
         if language and language != "auto":
-            prompt = f"Transcribe this audio exactly as spoken in {language}. Return only the transcription, nothing else."
+            prompt = f"Transcribe this audio exactly as spoken in {language}. Return only the transcription, nothing else. If the audio is unclear or silent, return an empty string."
 
         response = self.client.chat.completions.create(
             model="gpt-4o-audio-preview",
@@ -172,7 +172,21 @@ class Transcriber:
             ]
         )
 
-        return response.choices[0].message.content.strip()
+        text = response.choices[0].message.content.strip()
+
+        # Detect hallucination patterns - GPT-4o sometimes generates fake conversations
+        hallucination_patterns = [
+            '"' in text and text.count('"') >= 4,  # Multiple quoted dialogues
+            'I\'m sorry' in text and 'transcribe' in text.lower(),  # Refusal message
+            'I cannot' in text and 'audio' in text.lower(),  # Refusal message
+            text.startswith('{') and text.endswith('}'),  # JSON-like output
+        ]
+
+        if any(hallucination_patterns):
+            print(f"[GPT-4o] Detected possible hallucination, falling back to Whisper...")
+            return self._transcribe_whisper(file_path, language)
+
+        return text
 
     def _transcribe_whisper(self, file_path, language=None):
         """Transcribe using OpenAI Whisper API - fast and reliable"""

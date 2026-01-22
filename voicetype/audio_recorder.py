@@ -3,6 +3,57 @@ import numpy as np
 from scipy.io.wavfile import write
 import tempfile
 import os
+import sys
+
+# macOS microphone permission request
+def request_microphone_permission():
+    """Request microphone permission on macOS using AVFoundation"""
+    if sys.platform != 'darwin':
+        return True
+
+    try:
+        import objc
+        from AVFoundation import AVCaptureDevice, AVMediaTypeAudio
+        from AVFoundation import AVAuthorizationStatusAuthorized, AVAuthorizationStatusNotDetermined
+
+        # Check current authorization status
+        status = AVCaptureDevice.authorizationStatusForMediaType_(AVMediaTypeAudio)
+
+        if status == AVAuthorizationStatusAuthorized:
+            print("[Audio] Microphone permission already granted")
+            return True
+        elif status == AVAuthorizationStatusNotDetermined:
+            print("[Audio] Requesting microphone permission...")
+            # Request permission - this will show the system dialog
+            import threading
+            event = threading.Event()
+            result = [False]
+
+            def callback(granted):
+                result[0] = granted
+                event.set()
+
+            AVCaptureDevice.requestAccessForMediaType_completionHandler_(AVMediaTypeAudio, callback)
+            event.wait(timeout=30)  # Wait up to 30 seconds for user response
+
+            if result[0]:
+                print("[Audio] Microphone permission granted!")
+                return True
+            else:
+                print("[Audio] Microphone permission denied")
+                return False
+        else:
+            print(f"[Audio] Microphone permission denied (status: {status})")
+            print("[Audio] Please enable microphone access in System Settings > Privacy & Security > Microphone")
+            return False
+
+    except ImportError as e:
+        print(f"[Audio] Could not import AVFoundation: {e}")
+        print("[Audio] Falling back to sounddevice (permission dialog may not appear)")
+        return True
+    except Exception as e:
+        print(f"[Audio] Error requesting microphone permission: {e}")
+        return True
 
 # Maximum recording duration in seconds (2 minutes)
 MAX_RECORDING_SECONDS = 120
@@ -18,9 +69,29 @@ class AudioRecorder:
 
     def start_recording(self):
         self.recording = []
+
+        # Request microphone permission on macOS (triggers system dialog if needed)
+        if not request_microphone_permission():
+            print("[Audio] WARNING: Microphone permission not granted!")
+
+        # Get the device's native sample rate for better compatibility
+        try:
+            device_info = sd.query_devices(kind='input')
+            native_rate = int(device_info['default_samplerate'])
+            # Use native rate if it's reasonable, otherwise fallback to 16000
+            if 16000 <= native_rate <= 48000:
+                self.sample_rate = native_rate
+        except Exception as e:
+            print(f"[Audio] Could not query device: {e}")
+
         print(f"[Audio] Starting recording with sample rate {self.sample_rate}")
         try:
-            self.stream = sd.InputStream(samplerate=self.sample_rate, channels=1, callback=self.callback)
+            self.stream = sd.InputStream(
+                samplerate=self.sample_rate,
+                channels=1,
+                callback=self.callback,
+                dtype='float32'
+            )
             self.stream.start()
             print("[Audio] Recording started successfully")
         except Exception as e:

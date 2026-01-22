@@ -37,6 +37,55 @@ def check_accessibility_permission():
         return False
 
 
+def check_microphone_permission():
+    """Check if we have Microphone permissions and prompt if not"""
+    try:
+        from AVFoundation import AVCaptureDevice, AVMediaTypeAudio
+        from AVFoundation import AVAuthorizationStatusAuthorized, AVAuthorizationStatusNotDetermined, AVAuthorizationStatusDenied
+
+        status = AVCaptureDevice.authorizationStatusForMediaType_(AVMediaTypeAudio)
+        print(f"[Main] Microphone authorization status: {status}")
+
+        if status == AVAuthorizationStatusAuthorized:
+            print("[Main] Microphone permission already granted")
+            return True
+        elif status == AVAuthorizationStatusNotDetermined:
+            print("[Main] Requesting microphone permission...")
+            # Request permission - this triggers the system dialog
+            import threading
+            event = threading.Event()
+            result = [False]
+
+            def callback(granted):
+                result[0] = granted
+                print(f"[Main] Microphone permission callback: granted={granted}")
+                event.set()
+
+            AVCaptureDevice.requestAccessForMediaType_completionHandler_(AVMediaTypeAudio, callback)
+            event.wait(timeout=60)  # Wait up to 60 seconds for user response
+
+            if result[0]:
+                print("[Main] Microphone permission granted!")
+                return True
+            else:
+                print("[Main] Microphone permission denied by user")
+                return False
+        else:
+            # Permission was denied previously
+            print("[Main] Microphone permission denied, opening System Settings...")
+            subprocess.run([
+                'open', 'x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone'
+            ])
+            return False
+
+    except ImportError as e:
+        print(f"[Main] Could not import AVFoundation: {e}")
+        return True  # Allow to continue, will fail later if no permission
+    except Exception as e:
+        print(f"[Main] Error checking microphone permission: {e}")
+        return True
+
+
 def get_resource_path(relative_path):
     """Get absolute path to resource, works for dev and for PyInstaller"""
     if hasattr(sys, '_MEIPASS'):
@@ -382,7 +431,22 @@ if __name__ == "__main__":
         import sys
         sys.exit(0)
 
-    # Check accessibility permissions first
+    # Check microphone permission first - this triggers the system permission dialog
+    print("[Main] Checking microphone permission...")
+    has_microphone = check_microphone_permission()
+    if not has_microphone:
+        print("=" * 50)
+        print("MICROPHONE PERMISSION REQUIRED")
+        print("Please enable this app in System Settings > Privacy & Security > Microphone")
+        print("Then restart the app.")
+        print("=" * 50)
+        rumps.notification(
+            "Codiris Voice",
+            "Microphone Permission Required",
+            "Please enable in System Settings > Privacy & Security > Microphone"
+        )
+
+    # Check accessibility permissions
     has_accessibility = check_accessibility_permission()
     if not has_accessibility:
         print("=" * 50)

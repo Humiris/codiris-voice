@@ -2465,8 +2465,7 @@ HTML_CONTENT = '''
                 const data = await response.json();
 
                 if (data.url) {
-                    window.open(data.url, '_blank');
-                    closeUpgradeModal();
+                    window.location.href = data.url;
                 } else {
                     alert('Error: ' + (data.error || 'Could not start checkout'));
                 }

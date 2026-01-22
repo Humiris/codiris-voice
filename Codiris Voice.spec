@@ -5,7 +5,7 @@ a = Analysis(
     ['voicetype/main.py'],
     pathex=[],
     binaries=[],
-    datas=[('voicetype/assets', 'voicetype/assets')],
+    datas=[('voicetype/ui', 'voicetype/ui'), ('voicetype/assets', 'voicetype/assets')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

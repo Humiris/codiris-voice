@@ -83,7 +83,7 @@ function SuccessContent() {
             transition={{ duration: 0.6, delay: 0.5 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <a href="https://github.com/Humiris/codiris-voice/releases/latest/download/Codiris.Voice.dmg">
+            <a href="/Codiris-Voice.dmg" download>
               <button className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full font-semibold transition-colors">
                 <Download className="w-5 h-5" />
                 Download App
