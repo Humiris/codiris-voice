@@ -7,12 +7,27 @@ class AIEnhancer:
     def set_api_key(self, api_key):
         self.client = OpenAI(api_key=api_key)
 
-    def enhance(self, text, mode="Clean"):
+    def enhance(self, text, mode="Clean", custom_prompt=None):
         if not self.client or mode == "Raw":
             return text
-        
+
+        # If custom prompt is provided, use it directly
+        if custom_prompt:
+            try:
+                response = self.client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[
+                        {"role": "system", "content": custom_prompt},
+                        {"role": "user", "content": text}
+                    ]
+                )
+                return response.choices[0].message.content.strip()
+            except Exception as e:
+                print(f"AI Enhancement with custom prompt failed: {e}")
+                return text
+
         system_prompt = "You are a helpful assistant that cleans up and formats voice transcriptions. You only return the final text, no explanations."
-        
+
         prompts = {
             "Clean": f"Clean up this transcription. Fix grammar, punctuation, and capitalization:\n\n{text}",
             "Format": f"Format this transcription professionally. Fix grammar and punctuation:\n\n{text}",

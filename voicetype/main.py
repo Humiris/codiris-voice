@@ -362,7 +362,8 @@ class VoiceTypeApp(rumps.App):
 
                     # Generate improved version in background and show as suggestion
                     if self.config["mode"] != "Raw":
-                        refined_text = self.enhancer.enhance(text, mode=self.config["mode"])
+                        custom_prompt = self.config.get("custom_prompt")
+                        refined_text = self.enhancer.enhance(text, mode=self.config["mode"], custom_prompt=custom_prompt)
 
                         # Map mode to style
                         style_map = {

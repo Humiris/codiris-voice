@@ -684,6 +684,220 @@ HTML_CONTENT = '''
             color: #666;
         }
 
+        /* Custom Styles Section */
+        .custom-styles-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .custom-styles-header h4 {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+        }
+        .add-custom-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: #e8f4ff;
+            color: #0066cc;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .add-custom-btn:hover {
+            background: #d0e8ff;
+        }
+        .custom-styles-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .custom-style {
+            position: relative;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .custom-style:hover {
+            border-color: #0066cc;
+        }
+        .custom-style.active {
+            border-color: #0066cc;
+            background: #e8f4ff;
+        }
+        .custom-style h4 {
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: #1a1a1a;
+        }
+        .custom-style p {
+            font-size: 12px;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .custom-style-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .custom-style:hover .custom-style-actions {
+            opacity: 1;
+        }
+        .custom-style-actions button {
+            padding: 4px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .custom-style-actions button:hover {
+            background: #f5f5f5;
+        }
+        .custom-style-actions .delete-btn:hover {
+            background: #fee;
+            border-color: #f66;
+            color: #c00;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: scale(0.95);
+            transition: transform 0.3s;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 {
+            font-size: 18px;
+            margin: 0;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 4px;
+        }
+        .modal-close:hover {
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #333;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2f0df4;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        .form-group .hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .modal-footer button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .modal-footer .cancel-btn {
+            background: white;
+            border: 2px solid #eee;
+            color: #666;
+        }
+        .modal-footer .cancel-btn:hover {
+            background: #f5f5f5;
+        }
+        .modal-footer .save-btn {
+            background: #2f0df4;
+            border: none;
+            color: white;
+        }
+        .modal-footer .save-btn:hover {
+            background: #2509c4;
+        }
+        .modal-footer .save-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* History Section */
         .history-list {
             max-height: 300px;
@@ -1276,6 +1490,22 @@ HTML_CONTENT = '''
                         <h4>Notes</h4>
                         <p>Structure as meeting notes with bullet points</p>
                     </div>
+                </div>
+
+                <!-- Custom Styles Section -->
+                <div style="margin-top: 24px;">
+                    <div class="custom-styles-header">
+                        <h4>Custom Styles</h4>
+                        <button class="add-custom-btn" onclick="openCustomStyleModal()">
+                            <span>+</span> Add Custom
+                        </button>
+                    </div>
+                    <div class="custom-styles-grid" id="customStylesGrid">
+                        <!-- Custom styles will be rendered here -->
+                    </div>
+                    <p id="noCustomStyles" style="color: #888; font-size: 13px; margin-top: 12px;">
+                        No custom styles yet. Create your own with custom system prompts!
+                    </p>
                 </div>
             </div>
 
@@ -1955,18 +2185,171 @@ HTML_CONTENT = '''
             event.currentTarget.classList.add('active');
         }
 
-        function selectMode(mode, element) {
+        function selectMode(mode, element, customPrompt = null) {
             document.querySelectorAll('.ai-mode').forEach(m => m.classList.remove('active'));
-            element.classList.add('active');
+            document.querySelectorAll('.custom-style').forEach(m => m.classList.remove('active'));
+            if (element) element.classList.add('active');
             currentMode = mode;
 
             // Save to server
             fetch('/set-mode', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ mode: mode })
+                body: JSON.stringify({ mode: mode, custom_prompt: customPrompt })
             });
         }
+
+        // Custom Styles Management
+        let customStyles = [];
+        let editingStyleId = null;
+
+        function loadCustomStyles() {
+            const saved = localStorage.getItem('customStyles');
+            if (saved) {
+                try {
+                    customStyles = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Failed to parse custom styles:', e);
+                    customStyles = [];
+                }
+            }
+            renderCustomStyles();
+        }
+
+        function saveCustomStylesToStorage() {
+            localStorage.setItem('customStyles', JSON.stringify(customStyles));
+        }
+
+        function renderCustomStyles() {
+            const grid = document.getElementById('customStylesGrid');
+            const noStylesMsg = document.getElementById('noCustomStyles');
+
+            if (customStyles.length === 0) {
+                grid.innerHTML = '';
+                noStylesMsg.style.display = 'block';
+                return;
+            }
+
+            noStylesMsg.style.display = 'none';
+            grid.innerHTML = customStyles.map(style => `
+                <div class="custom-style ${currentMode === 'Custom_' + style.id ? 'active' : ''}"
+                     onclick="selectCustomStyle('${style.id}')">
+                    <h4>${escapeHtml(style.name)}</h4>
+                    <p>${escapeHtml(style.description)}</p>
+                    <div class="custom-style-actions">
+                        <button onclick="event.stopPropagation(); editCustomStyle('${style.id}')">✏️</button>
+                        <button class="delete-btn" onclick="event.stopPropagation(); deleteCustomStyle('${style.id}')">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function selectCustomStyle(styleId) {
+            const style = customStyles.find(s => s.id === styleId);
+            if (style) {
+                document.querySelectorAll('.ai-mode').forEach(m => m.classList.remove('active'));
+                document.querySelectorAll('.custom-style').forEach(m => m.classList.remove('active'));
+                event.currentTarget.classList.add('active');
+                currentMode = 'Custom_' + styleId;
+
+                // Save to server with custom prompt
+                fetch('/set-mode', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode: 'Custom', custom_prompt: style.systemPrompt })
+                });
+            }
+        }
+
+        function openCustomStyleModal() {
+            editingStyleId = null;
+            document.getElementById('modalTitle').textContent = 'Add Custom Style';
+            document.getElementById('styleName').value = '';
+            document.getElementById('styleDesc').value = '';
+            document.getElementById('stylePrompt').value = '';
+            document.getElementById('saveStyleBtn').textContent = 'Save Style';
+            document.getElementById('customStyleModal').classList.add('active');
+        }
+
+        function closeCustomStyleModal() {
+            document.getElementById('customStyleModal').classList.remove('active');
+            editingStyleId = null;
+        }
+
+        function editCustomStyle(styleId) {
+            const style = customStyles.find(s => s.id === styleId);
+            if (style) {
+                editingStyleId = styleId;
+                document.getElementById('modalTitle').textContent = 'Edit Custom Style';
+                document.getElementById('styleName').value = style.name;
+                document.getElementById('styleDesc').value = style.description;
+                document.getElementById('stylePrompt').value = style.systemPrompt;
+                document.getElementById('saveStyleBtn').textContent = 'Update Style';
+                document.getElementById('customStyleModal').classList.add('active');
+            }
+        }
+
+        function saveCustomStyle() {
+            const name = document.getElementById('styleName').value.trim();
+            const desc = document.getElementById('styleDesc').value.trim();
+            const prompt = document.getElementById('stylePrompt').value.trim();
+
+            if (!name || !prompt) {
+                alert('Please enter a name and system prompt');
+                return;
+            }
+
+            if (editingStyleId) {
+                // Update existing style
+                const index = customStyles.findIndex(s => s.id === editingStyleId);
+                if (index !== -1) {
+                    customStyles[index] = {
+                        ...customStyles[index],
+                        name: name,
+                        description: desc || 'Custom style',
+                        systemPrompt: prompt
+                    };
+                }
+            } else {
+                // Add new style
+                const newStyle = {
+                    id: 'style_' + Date.now(),
+                    name: name,
+                    description: desc || 'Custom style',
+                    systemPrompt: prompt
+                };
+                customStyles.push(newStyle);
+            }
+
+            saveCustomStylesToStorage();
+            renderCustomStyles();
+            closeCustomStyleModal();
+        }
+
+        function deleteCustomStyle(styleId) {
+            if (confirm('Are you sure you want to delete this custom style?')) {
+                customStyles = customStyles.filter(s => s.id !== styleId);
+                saveCustomStylesToStorage();
+                renderCustomStyles();
+
+                // If this was the active style, reset to Raw
+                if (currentMode === 'Custom_' + styleId) {
+                    const rawElement = document.querySelector('.ai-mode');
+                    if (rawElement) selectMode('Raw', rawElement);
+                }
+            }
+        }
+
+        // Load custom styles on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCustomStyles();
+        });
 
         function updateLanguageMode(value) {
             fetch('/set-setting', {
@@ -2583,6 +2966,33 @@ HTML_CONTENT = '''
             <button class="profile-signout" onclick="signOut(); closeProfilePopup();">Sign Out</button>
         </div>
     </div>
+
+    <!-- Custom Style Modal -->
+    <div class="modal-overlay" id="customStyleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Custom Style</h3>
+                <button class="modal-close" onclick="closeCustomStyleModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="styleName">Style Name</label>
+                <input type="text" id="styleName" placeholder="e.g., Technical Writer">
+            </div>
+            <div class="form-group">
+                <label for="styleDesc">Short Description</label>
+                <input type="text" id="styleDesc" placeholder="e.g., Clear technical documentation">
+            </div>
+            <div class="form-group">
+                <label for="stylePrompt">System Prompt</label>
+                <textarea id="stylePrompt" placeholder="You are a technical writer. Your task is to take the user's spoken input and convert it into clear, precise technical documentation..."></textarea>
+                <div class="hint">This prompt tells the AI how to refine your text. Be specific about the tone, style, and format you want.</div>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn" onclick="closeCustomStyleModal()">Cancel</button>
+                <button class="save-btn" id="saveStyleBtn" onclick="saveCustomStyle()">Save Style</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 '''
@@ -2949,7 +3359,15 @@ class WebUIHandler(http.server.SimpleHTTPRequestHandler):
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             data = json.loads(post_data.decode())
-            # Mode setting would be handled here
+            # Save mode and optional custom prompt to config
+            from voicetype.settings import load_config, save_config
+            config = load_config()
+            config['mode'] = data.get('mode', 'Raw')
+            if 'custom_prompt' in data:
+                config['custom_prompt'] = data['custom_prompt']
+            else:
+                config['custom_prompt'] = None
+            save_config(config)
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
