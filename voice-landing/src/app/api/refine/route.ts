@@ -14,19 +14,20 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { text, style = "professional" } = await req.json();
+    const { text, style = "professional", customPrompt } = await req.json();
 
     if (!text) {
       return NextResponse.json({ error: "No text provided" }, { status: 400 });
     }
 
-    const stylePrompts = {
+    const stylePrompts: Record<string, string> = {
       professional: "You are a professional communication expert. Your task is to take the user's spoken input (which might be messy, informal, or have grammatical errors) and provide a professional, clear, and polished version. The result should be formal, well-structured, and suitable for business communication. Only return the refined text, nothing else.",
       casual: "You are a friendly communication expert. Your task is to take the user's spoken input and provide a casual, conversational version. The result should be friendly, approachable, and natural-sounding while still being clear and grammatically correct. Only return the refined text, nothing else.",
       concise: "You are a concise communication expert. Your task is to take the user's spoken input and provide the most brief and direct version possible. Remove any unnecessary words while preserving the core message. The result should be short, clear, and to the point. Only return the refined text, nothing else."
     };
 
-    const systemPrompt = stylePrompts[style as keyof typeof stylePrompts] || stylePrompts.professional;
+    // Use custom prompt if provided, otherwise use predefined style
+    const systemPrompt = customPrompt || stylePrompts[style] || stylePrompts.professional;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",

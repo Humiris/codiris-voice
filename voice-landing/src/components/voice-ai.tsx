@@ -18,7 +18,10 @@ import {
   ArrowRightLeft,
   RefreshCw,
   Edit3,
-  X
+  X,
+  Plus,
+  Pencil,
+  Save
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -33,6 +36,19 @@ interface Refinement {
   timestamp: Date;
 }
 
+interface CustomStyle {
+  id: string;
+  name: string;
+  description: string;
+  systemPrompt: string;
+}
+
+const DEFAULT_STYLES = [
+  { value: "professional", label: "Professional", desc: "Formal and clear" },
+  { value: "casual", label: "Casual", desc: "Friendly tone" },
+  { value: "concise", label: "Concise", desc: "Brief and direct" }
+];
+
 export function VoiceAI() {
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -45,13 +61,38 @@ export function VoiceAI() {
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState("");
   const [isRegenerating, setIsRegenerating] = useState(false);
-  const [refinementStyle, setRefinementStyle] = useState<"professional" | "casual" | "concise">("professional");
-  
+  const [refinementStyle, setRefinementStyle] = useState<string>("professional");
+  const [customStyles, setCustomStyles] = useState<CustomStyle[]>([]);
+  const [showStyleModal, setShowStyleModal] = useState(false);
+  const [editingStyle, setEditingStyle] = useState<CustomStyle | null>(null);
+  const [newStyleName, setNewStyleName] = useState("");
+  const [newStyleDesc, setNewStyleDesc] = useState("");
+  const [newStylePrompt, setNewStylePrompt] = useState("");
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
+
+  // Load custom styles from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("customRefinementStyles");
+    if (saved) {
+      try {
+        setCustomStyles(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to parse custom styles:", e);
+      }
+    }
+  }, []);
+
+  // Save custom styles to localStorage
+  useEffect(() => {
+    if (customStyles.length > 0) {
+      localStorage.setItem("customRefinementStyles", JSON.stringify(customStyles));
+    }
+  }, [customStyles]);
 
   // Initialize Audio Context for Visualizer
   const startVisualizer = (stream: MediaStream) => {
@@ -134,10 +175,20 @@ export function VoiceAI() {
         setTranscript(transcribeData.text);
 
         // Now refine the text
+        const customStyle = customStyles.find(s => s.id === refinementStyle);
+        const refineBody: { text: string; style?: string; customPrompt?: string } = {
+          text: transcribeData.text
+        };
+        if (customStyle) {
+          refineBody.customPrompt = customStyle.systemPrompt;
+        } else {
+          refineBody.style = refinementStyle;
+        }
+
         const refineRes = await fetch("/api/refine", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: transcribeData.text, style: refinementStyle }),
+          body: JSON.stringify(refineBody),
         });
 
         const refineData = await refineRes.json();
@@ -154,14 +205,22 @@ export function VoiceAI() {
     }
   };
 
-  const handleRegenerateWithStyle = async (style: "professional" | "casual" | "concise") => {
+  const handleRegenerateWithStyle = async (styleId: string, customPrompt?: string) => {
     setIsRegenerating(true);
-    setRefinementStyle(style);
+    setRefinementStyle(styleId);
     try {
+      const body: { text: string; style?: string; customPrompt?: string } = { text: transcript };
+
+      if (customPrompt) {
+        body.customPrompt = customPrompt;
+      } else {
+        body.style = styleId;
+      }
+
       const refineRes = await fetch("/api/refine", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: transcript, style }),
+        body: JSON.stringify(body),
       });
 
       const refineData = await refineRes.json();
@@ -175,6 +234,58 @@ export function VoiceAI() {
     } finally {
       setIsRegenerating(false);
     }
+  };
+
+  const handleSaveCustomStyle = () => {
+    if (!newStyleName.trim() || !newStylePrompt.trim()) return;
+
+    if (editingStyle) {
+      // Update existing style
+      setCustomStyles(prev => prev.map(s =>
+        s.id === editingStyle.id
+          ? { ...s, name: newStyleName, description: newStyleDesc, systemPrompt: newStylePrompt }
+          : s
+      ));
+    } else {
+      // Add new style
+      const newStyle: CustomStyle = {
+        id: `custom_${Date.now()}`,
+        name: newStyleName,
+        description: newStyleDesc || "Custom style",
+        systemPrompt: newStylePrompt
+      };
+      setCustomStyles(prev => [...prev, newStyle]);
+    }
+
+    // Reset modal state
+    setShowStyleModal(false);
+    setEditingStyle(null);
+    setNewStyleName("");
+    setNewStyleDesc("");
+    setNewStylePrompt("");
+  };
+
+  const handleEditStyle = (style: CustomStyle) => {
+    setEditingStyle(style);
+    setNewStyleName(style.name);
+    setNewStyleDesc(style.description);
+    setNewStylePrompt(style.systemPrompt);
+    setShowStyleModal(true);
+  };
+
+  const handleDeleteStyle = (styleId: string) => {
+    setCustomStyles(prev => prev.filter(s => s.id !== styleId));
+    if (refinementStyle === styleId) {
+      setRefinementStyle("professional");
+    }
+  };
+
+  const openAddStyleModal = () => {
+    setEditingStyle(null);
+    setNewStyleName("");
+    setNewStyleDesc("");
+    setNewStylePrompt("");
+    setShowStyleModal(true);
   };
 
   const handleAccept = () => {
@@ -365,7 +476,10 @@ export function VoiceAI() {
                               {isEditing ? "Stop" : "Edit"}
                             </button>
                             <button
-                              onClick={() => handleRegenerateWithStyle(refinementStyle)}
+                              onClick={() => {
+                                const customStyle = customStyles.find(s => s.id === refinementStyle);
+                                handleRegenerateWithStyle(refinementStyle, customStyle?.systemPrompt);
+                              }}
                               disabled={isRegenerating}
                               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-sm text-slate-900 transition-colors disabled:opacity-50 font-semibold"
                             >
@@ -439,7 +553,10 @@ export function VoiceAI() {
                             {isEditing ? "Stop" : "Edit"}
                           </button>
                           <button
-                            onClick={() => handleRegenerateWithStyle(refinementStyle)}
+                            onClick={() => {
+                              const customStyle = customStyles.find(s => s.id === refinementStyle);
+                              handleRegenerateWithStyle(refinementStyle, customStyle?.systemPrompt);
+                            }}
                             disabled={isRegenerating}
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-sm text-slate-900 transition-colors disabled:opacity-50 font-semibold"
                           >
@@ -499,22 +616,27 @@ export function VoiceAI() {
 
                   {/* Refinement Style Selector - Moved Below Results */}
                   <div className="space-y-3 pt-4">
-                    <label className="text-xs font-bold uppercase tracking-widest text-slate-600 flex items-center gap-2">
-                      <Sparkles className="w-3 h-3" />
-                      Refinement Style
-                    </label>
-                    <div className="flex gap-2">
-                      {[
-                        { value: "professional", label: "Professional", desc: "Formal and clear" },
-                        { value: "casual", label: "Casual", desc: "Friendly tone" },
-                        { value: "concise", label: "Concise", desc: "Brief and direct" }
-                      ].map((style) => (
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold uppercase tracking-widest text-slate-600 flex items-center gap-2">
+                        <Sparkles className="w-3 h-3" />
+                        Refinement Style
+                      </label>
+                      <button
+                        onClick={openAddStyleModal}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-semibold transition-colors"
+                      >
+                        <Plus className="w-3 h-3" />
+                        Add Custom
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {DEFAULT_STYLES.map((style) => (
                         <button
                           key={style.value}
-                          onClick={() => handleRegenerateWithStyle(style.value as any)}
+                          onClick={() => handleRegenerateWithStyle(style.value)}
                           disabled={isRegenerating}
                           className={cn(
-                            "flex-1 px-4 py-3 rounded-xl border-2 transition-all text-left",
+                            "px-4 py-3 rounded-xl border-2 transition-all text-left",
                             refinementStyle === style.value
                               ? "bg-slate-900 border-slate-900 text-white"
                               : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300",
@@ -526,6 +648,58 @@ export function VoiceAI() {
                         </button>
                       ))}
                     </div>
+
+                    {/* Custom Styles */}
+                    {customStyles.length > 0 && (
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold uppercase tracking-widest text-slate-500">
+                          Custom Styles
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {customStyles.map((style) => (
+                            <div
+                              key={style.id}
+                              className={cn(
+                                "relative group px-4 py-3 rounded-xl border-2 transition-all text-left",
+                                refinementStyle === style.id
+                                  ? "bg-blue-600 border-blue-600 text-white"
+                                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300",
+                                isRegenerating && "opacity-50"
+                              )}
+                            >
+                              <button
+                                onClick={() => handleRegenerateWithStyle(style.id, style.systemPrompt)}
+                                disabled={isRegenerating}
+                                className="w-full text-left"
+                              >
+                                <div className="font-semibold text-sm">{style.name}</div>
+                                <div className="text-xs opacity-70 truncate">{style.description}</div>
+                              </button>
+                              <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleEditStyle(style); }}
+                                  className={cn(
+                                    "p-1 rounded",
+                                    refinementStyle === style.id ? "hover:bg-blue-500" : "hover:bg-slate-200"
+                                  )}
+                                >
+                                  <Pencil className="w-3 h-3" />
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleDeleteStyle(style.id); }}
+                                  className={cn(
+                                    "p-1 rounded",
+                                    refinementStyle === style.id ? "hover:bg-red-400" : "hover:bg-red-100 text-red-600"
+                                  )}
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -611,6 +785,100 @@ export function VoiceAI() {
           </div>
         </div>
       </main>
+
+      {/* Custom Style Modal */}
+      <AnimatePresence>
+        {showStyleModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+            onClick={() => setShowStyleModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-slate-900">
+                  {editingStyle ? "Edit Custom Style" : "Add Custom Style"}
+                </h3>
+                <button
+                  onClick={() => setShowStyleModal(false)}
+                  className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+                >
+                  <X className="w-5 h-5 text-slate-500" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    Style Name
+                  </label>
+                  <input
+                    type="text"
+                    value={newStyleName}
+                    onChange={(e) => setNewStyleName(e.target.value)}
+                    placeholder="e.g., Technical Writer"
+                    className="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-slate-900 focus:outline-none transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    Short Description
+                  </label>
+                  <input
+                    type="text"
+                    value={newStyleDesc}
+                    onChange={(e) => setNewStyleDesc(e.target.value)}
+                    placeholder="e.g., Clear technical documentation"
+                    className="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-slate-900 focus:outline-none transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    System Prompt
+                  </label>
+                  <textarea
+                    value={newStylePrompt}
+                    onChange={(e) => setNewStylePrompt(e.target.value)}
+                    placeholder="You are a technical writer. Your task is to take the user's spoken input and convert it into clear, precise technical documentation..."
+                    rows={6}
+                    className="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-slate-900 focus:outline-none transition-colors resize-none"
+                  />
+                  <p className="text-xs text-slate-500 mt-1.5">
+                    This prompt tells the AI how to refine your text. Be specific about the tone, style, and format you want.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={() => setShowStyleModal(false)}
+                  className="px-5 py-2.5 rounded-xl border-2 border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveCustomStyle}
+                  disabled={!newStyleName.trim() || !newStylePrompt.trim()}
+                  className="px-5 py-2.5 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <Save className="w-4 h-4" />
+                  {editingStyle ? "Update Style" : "Save Style"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
