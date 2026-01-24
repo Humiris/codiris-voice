@@ -11,18 +11,19 @@ MAX_FILE_SIZE = 25 * 1024 * 1024
 
 class Transcriber:
     # Built-in API keys
+    OPENAI_API_KEY = "sk-proj-VLnNhAD7WuWzgJ3cPBg6T3BlbkFJsvenWYpnydczy45T9ITK"
     GROQ_API_KEY = "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"
     DEEPGRAM_API_KEY = "b78e6bfb0b310261686d7ebbbcff4403907a6f48"
     ASSEMBLYAI_API_KEY = "7e681f165b3b49aea39d293a1fadec75"
 
     def __init__(self, api_key=None, local=False, model="gpt4o", groq_key=None, deepgram_key=None, assemblyai_key=None):
-        self.api_key = api_key
+        self.api_key = api_key or self.OPENAI_API_KEY
         self.groq_key = groq_key or self.GROQ_API_KEY
         self.deepgram_key = deepgram_key or self.DEEPGRAM_API_KEY
         self.assemblyai_key = assemblyai_key or self.ASSEMBLYAI_API_KEY
         self.local = local
         self.model = model
-        self.client = OpenAI(api_key=api_key) if api_key else None
+        self.client = OpenAI(api_key=self.api_key)
         self._local_model = None
         self._local_model_name = None
         self._loading_local = False

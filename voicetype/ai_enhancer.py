@@ -1,11 +1,16 @@
 from openai import OpenAI
 
 class AIEnhancer:
-    def __init__(self, api_key):
-        self.client = OpenAI(api_key=api_key) if api_key else None
+    # Built-in API key
+    OPENAI_API_KEY = "sk-proj-VLnNhAD7WuWzgJ3cPBg6T3BlbkFJsvenWYpnydczy45T9ITK"
+
+    def __init__(self, api_key=None):
+        self.api_key = api_key or self.OPENAI_API_KEY
+        self.client = OpenAI(api_key=self.api_key)
 
     def set_api_key(self, api_key):
-        self.client = OpenAI(api_key=api_key)
+        self.api_key = api_key or self.OPENAI_API_KEY
+        self.client = OpenAI(api_key=self.api_key)
 
     def enhance(self, text, mode="Clean", custom_prompt=None):
         if not self.client or mode == "Raw":
