@@ -107,6 +107,9 @@ class VoiceTypeApp(rumps.App):
         self.icon_processing = get_resource_path(os.path.join("assets", "icon_processing.png"))
 
         super(VoiceTypeApp, self).__init__("Codiris Voice", icon=self.icon_idle, template=False)
+
+        # Set up dock icon click handler
+        self._setup_dock_click_handler()
         self.config = load_config()
 
         self.recorder = AudioRecorder()
@@ -169,6 +172,28 @@ class VoiceTypeApp(rumps.App):
 
         # Check for updates in background
         self._check_for_updates()
+
+    def _setup_dock_click_handler(self):
+        """Set up handler for dock icon clicks to open dashboard"""
+        try:
+            from AppKit import NSApplication, NSObject
+            from PyObjCTools import AppHelper
+            import objc
+
+            app = NSApplication.sharedApplication()
+
+            class AppDelegate(NSObject):
+                def applicationShouldHandleReopen_hasVisibleWindows_(self, app, flag):
+                    # Called when user clicks dock icon
+                    print("[Main] Dock icon clicked, opening dashboard")
+                    _pending_actions.append("settings")
+                    return True
+
+            self._app_delegate = AppDelegate.alloc().init()
+            app.setDelegate_(self._app_delegate)
+            print("[Main] Dock click handler set up successfully")
+        except Exception as e:
+            print(f"[Main] Could not set up dock click handler: {e}")
 
     def _check_for_updates(self):
         """Check for updates in background thread"""
