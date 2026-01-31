@@ -87,7 +87,7 @@ app = BUNDLE(
         'CFBundleVersion': '1.0.0',
         'CFBundleShortVersionString': '1.0.0',
         'LSMinimumSystemVersion': '10.15',
-        'LSUIElement': True,
+        'LSUIElement': False,
         'NSMicrophoneUsageDescription': 'Codiris Voice needs microphone access to transcribe your speech.',
         'NSAppleEventsUsageDescription': 'Codiris Voice needs to type text into other applications.',
         'NSHighResolutionCapable': True,
