@@ -26,7 +26,7 @@ export default function InstallPage() {
             <p className="text-xl text-slate-600 mb-6">
               Get Codiris Voice up and running in minutes
             </p>
-            <a href="https://github.com/Humiris/codiris-voice/releases/download/v1.1.0/CodirisVoice-v1.1.0.dmg" download>
+            <a href="/downloads">
               <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95">
                 <Download className="w-5 h-5 inline-block mr-2" />
                 Download Codiris Voice.dmg
