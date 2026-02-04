@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Play, Smartphone, Monitor, Laptop } from "lucide-react";
+import { Play, Smartphone, Monitor, Laptop, Download, ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 const platforms = [
   { id: "ios", label: "iOS", icon: Smartphone },
@@ -11,8 +12,33 @@ const platforms = [
   { id: "windows", label: "Windows", icon: Monitor },
 ];
 
+const platformContent = {
+  ios: {
+    title: "AI voice keyboard for iPhone",
+    description: "Replace your keyboard's dictation with AI-powered voice typing. Works in every app - Messages, Slack, WhatsApp, Notes, and more.",
+    cta: "Download on App Store",
+    ctaLink: "https://apps.apple.com/app/codiris-voice",
+    available: true,
+  },
+  mac: {
+    title: "Instant voice-to-text for Mac",
+    description: "Press a hotkey, speak naturally, and watch AI-polished text appear anywhere. Perfect for emails, docs, and code comments.",
+    cta: "Download for Mac",
+    ctaLink: "/install",
+    available: true,
+  },
+  windows: {
+    title: "Coming soon to Windows",
+    description: "We're working on bringing Codiris Voice to Windows. Join the waitlist to be notified when it's ready.",
+    cta: "Join Waitlist",
+    ctaLink: "#",
+    available: false,
+  },
+};
+
 export const PlatformSection = () => {
   const [activeTab, setActiveTab] = useState("ios");
+  const content = platformContent[activeTab as keyof typeof platformContent];
 
   return (
     <section className="bg-[#050505] py-12 md:py-20 px-4 sm:px-6 lg:px-8">
@@ -36,71 +62,61 @@ export const PlatformSection = () => {
               ))}
             </div>
 
-            <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white leading-[1.1] mb-6 tracking-tight">
-              Write faster in all your apps, on any device
-            </h2>
-            <p className="text-lg md:text-xl text-white/50 mb-8 max-w-lg leading-relaxed">
-              Codiris Voice works everywhere you do. Just speak, and watch your words appear instantly in Slack, WhatsApp, Gmail, and more.
-            </p>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white leading-[1.1] mb-6 tracking-tight">
+                  {content.title}
+                </h2>
+                <p className="text-lg md:text-xl text-white/50 mb-8 max-w-lg leading-relaxed">
+                  {content.description}
+                </p>
 
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 py-6 md:px-10 md:py-8 text-base md:text-lg font-bold group transition-all duration-300 hover:scale-105">
-              <Play className="w-4 h-4 md:w-5 md:h-5 mr-3 fill-current" />
-              Watch in action
-            </Button>
+                {content.available ? (
+                  activeTab === "mac" ? (
+                    <Link href={content.ctaLink}>
+                      <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 py-6 md:px-10 md:py-8 text-base md:text-lg font-bold group transition-all duration-300 hover:scale-105">
+                        <Download className="w-4 h-4 md:w-5 md:h-5 mr-3" />
+                        {content.cta}
+                      </Button>
+                    </Link>
+                  ) : (
+                    <a href={content.ctaLink} target="_blank" rel="noopener noreferrer">
+                      <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 py-6 md:px-10 md:py-8 text-base md:text-lg font-bold group transition-all duration-300 hover:scale-105">
+                        <ExternalLink className="w-4 h-4 md:w-5 md:h-5 mr-3" />
+                        {content.cta}
+                      </Button>
+                    </a>
+                  )
+                ) : (
+                  <Button className="bg-white/10 hover:bg-white/20 text-white rounded-full px-8 py-6 md:px-10 md:py-8 text-base md:text-lg font-bold group transition-all duration-300 hover:scale-105 border border-white/20">
+                    {content.cta}
+                  </Button>
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           <div className="relative flex justify-center lg:justify-end mt-8 lg:mt-0">
-            <div className="relative w-full max-w-[300px] md:max-w-[340px] aspect-[9/18.5] bg-[#050505] rounded-[2.5rem] md:rounded-[3.5rem] border-[8px] md:border-[12px] border-[#222] shadow-[0_0_100px_rgba(0,0,0,0.5)] overflow-hidden">
-              {/* Mockup Content */}
-              <div className="p-6 md:p-8 h-full flex flex-col">
-                <div className="flex justify-between items-center mb-8 md:mb-10">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-zinc-900 border border-white/5" />
-                  <div className="flex gap-2 md:gap-3">
-                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-zinc-900 border border-white/5" />
-                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-zinc-900 border border-white/5" />
-                  </div>
-                </div>
-                
-                <div className="space-y-4 md:space-y-6 flex-1">
-                  <div className="bg-zinc-900/80 h-10 md:h-14 rounded-xl md:rounded-2xl w-4/5 border border-white/5" />
-                  <div className="bg-zinc-900/80 h-10 md:h-14 rounded-xl md:rounded-2xl w-3/5 border border-white/5" />
-                  
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="bg-blue-500/10 h-24 md:h-32 rounded-2xl md:rounded-3xl w-full border border-blue-500/30 p-4 md:p-5 relative overflow-hidden"
-                  >
-                    <div className="absolute top-0 left-0 w-1 h-full bg-blue-500" />
-                    <motion.p 
-                      className="text-blue-200 text-sm md:text-base font-medium leading-snug"
-                    >
-                      "Hey team, let's sync up on the new design tomorrow morning at 10am. I've got some ideas for the hero section..."
-                    </motion.p>
-                  </motion.div>
-                </div>
-
-                <div className="mt-auto flex justify-center pb-4 md:pb-6">
-                  <motion.div 
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-blue-600 flex items-center justify-center shadow-[0_0_50px_rgba(37,99,235,0.5)] cursor-pointer"
-                  >
-                    <div className="flex gap-1 md:gap-1.5 items-end h-6 md:h-8">
-                      <motion.div animate={{ height: [8, 20, 8] }} transition={{ duration: 0.8, repeat: Infinity }} className="w-1 md:w-1.5 bg-white rounded-full" />
-                      <motion.div animate={{ height: [12, 28, 12] }} transition={{ duration: 0.8, repeat: Infinity, delay: 0.1 }} className="w-1 md:w-1.5 bg-white rounded-full" />
-                      <motion.div animate={{ height: [10, 24, 10] }} transition={{ duration: 0.8, repeat: Infinity, delay: 0.2 }} className="w-1 md:w-1.5 bg-white rounded-full" />
-                    </div>
-                  </motion.div>
-                </div>
-              </div>
-
-              {/* Floating App Icons - Hidden on small screens to save space */}
-              <div className="absolute -left-12 md:-left-16 top-1/3 space-y-4 md:space-y-6 hidden sm:block">
-                <AppIcon color="bg-[#4A154B]" label="Slack" delay={0} />
-                <AppIcon color="bg-[#25D366]" label="WhatsApp" delay={0.2} />
-                <AppIcon color="bg-[#FFFC00]" label="Snapchat" delay={0.4} />
-              </div>
-            </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3 }}
+                className="relative"
+              >
+                {activeTab === "ios" && <PhoneMockup />}
+                {activeTab === "mac" && <MacMockup />}
+                {activeTab === "windows" && <WindowsMockup />}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -108,13 +124,121 @@ export const PlatformSection = () => {
   );
 };
 
+// Phone Mockup for iOS
+const PhoneMockup = () => (
+  <div className="relative w-full max-w-[300px] md:max-w-[340px] aspect-[9/18.5] bg-[#050505] rounded-[2.5rem] md:rounded-[3.5rem] border-[8px] md:border-[12px] border-[#222] shadow-[0_0_100px_rgba(0,0,0,0.5)] overflow-hidden">
+    <div className="p-6 md:p-8 h-full flex flex-col">
+      <div className="flex justify-between items-center mb-8 md:mb-10">
+        <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-zinc-900 border border-white/5" />
+        <div className="flex gap-2 md:gap-3">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-zinc-900 border border-white/5" />
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-zinc-900 border border-white/5" />
+        </div>
+      </div>
+
+      <div className="space-y-4 md:space-y-6 flex-1">
+        <div className="bg-zinc-900/80 h-10 md:h-14 rounded-xl md:rounded-2xl w-4/5 border border-white/5" />
+        <div className="bg-zinc-900/80 h-10 md:h-14 rounded-xl md:rounded-2xl w-3/5 border border-white/5" />
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-blue-500/10 h-24 md:h-32 rounded-2xl md:rounded-3xl w-full border border-blue-500/30 p-4 md:p-5 relative overflow-hidden"
+        >
+          <div className="absolute top-0 left-0 w-1 h-full bg-blue-500" />
+          <motion.p className="text-blue-200 text-sm md:text-base font-medium leading-snug">
+            "Hey team, let's sync up on the new design tomorrow morning at 10am..."
+          </motion.p>
+        </motion.div>
+      </div>
+
+      <div className="mt-auto flex justify-center pb-4 md:pb-6">
+        <motion.div
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-blue-600 flex items-center justify-center shadow-[0_0_50px_rgba(37,99,235,0.5)] cursor-pointer"
+        >
+          <div className="flex gap-1 md:gap-1.5 items-end h-6 md:h-8">
+            <motion.div animate={{ height: [8, 20, 8] }} transition={{ duration: 0.8, repeat: Infinity }} className="w-1 md:w-1.5 bg-white rounded-full" />
+            <motion.div animate={{ height: [12, 28, 12] }} transition={{ duration: 0.8, repeat: Infinity, delay: 0.1 }} className="w-1 md:w-1.5 bg-white rounded-full" />
+            <motion.div animate={{ height: [10, 24, 10] }} transition={{ duration: 0.8, repeat: Infinity, delay: 0.2 }} className="w-1 md:w-1.5 bg-white rounded-full" />
+          </div>
+        </motion.div>
+      </div>
+    </div>
+
+    <div className="absolute -left-12 md:-left-16 top-1/3 space-y-4 md:space-y-6 hidden sm:block">
+      <AppIcon color="bg-[#4A154B]" label="Slack" delay={0} />
+      <AppIcon color="bg-[#25D366]" label="WhatsApp" delay={0.2} />
+      <AppIcon color="bg-[#007AFF]" label="Messages" delay={0.4} />
+    </div>
+  </div>
+);
+
+// Mac Mockup
+const MacMockup = () => (
+  <div className="relative w-full max-w-[500px] aspect-[16/10] bg-[#1a1a1a] rounded-xl border-4 border-[#333] shadow-[0_0_100px_rgba(0,0,0,0.5)] overflow-hidden">
+    {/* Menu bar */}
+    <div className="h-6 bg-[#2a2a2a] flex items-center px-3 gap-1.5">
+      <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
+      <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
+      <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+      <span className="text-white/40 text-[10px] ml-2 font-medium">Codiris Voice</span>
+    </div>
+
+    <div className="p-6 h-full flex flex-col">
+      {/* Floating bar mockup */}
+      <div className="flex justify-center mb-8">
+        <motion.div
+          animate={{ scale: [1, 1.02, 1] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="bg-[#1a1a1c] rounded-full px-4 py-2 flex items-center gap-3 border border-white/10"
+        >
+          <span className="text-white/60 text-xs font-medium">Super Prompt</span>
+          <div className="flex gap-0.5 items-end h-4">
+            <motion.div animate={{ height: [4, 12, 4] }} transition={{ duration: 0.6, repeat: Infinity }} className="w-1 bg-blue-500 rounded-full" />
+            <motion.div animate={{ height: [6, 16, 6] }} transition={{ duration: 0.6, repeat: Infinity, delay: 0.1 }} className="w-1 bg-blue-500 rounded-full" />
+            <motion.div animate={{ height: [5, 14, 5] }} transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }} className="w-1 bg-blue-500 rounded-full" />
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Text editor mockup */}
+      <div className="flex-1 bg-[#0a0a0a] rounded-lg p-4 border border-white/5">
+        <div className="space-y-2">
+          <div className="bg-white/5 h-3 rounded w-3/4" />
+          <div className="bg-white/5 h-3 rounded w-1/2" />
+          <div className="bg-blue-500/20 h-6 rounded w-full border border-blue-500/30 mt-4" />
+        </div>
+      </div>
+    </div>
+
+    <div className="absolute -right-12 top-1/4 space-y-4 hidden sm:block">
+      <AppIcon color="bg-gradient-to-br from-blue-500 to-purple-600" label="VS" delay={0} />
+      <AppIcon color="bg-[#EA4335]" label="Gmail" delay={0.2} />
+      <AppIcon color="bg-[#0077B5]" label="LinkedIn" delay={0.4} />
+    </div>
+  </div>
+);
+
+// Windows Mockup (Coming Soon)
+const WindowsMockup = () => (
+  <div className="relative w-full max-w-[500px] aspect-[16/10] bg-[#1a1a1a] rounded-lg border-4 border-[#333] shadow-[0_0_100px_rgba(0,0,0,0.5)] overflow-hidden flex items-center justify-center">
+    <div className="text-center">
+      <Monitor className="w-16 h-16 text-white/20 mx-auto mb-4" />
+      <p className="text-white/40 text-lg font-medium">Coming Soon</p>
+      <p className="text-white/20 text-sm mt-2">Join the waitlist to be notified</p>
+    </div>
+  </div>
+);
+
 const AppIcon = ({ color, label, delay }: { color: string; label: string; delay: number }) => (
-  <motion.div 
+  <motion.div
     initial={{ x: -20, opacity: 0 }}
     whileInView={{ x: 0, opacity: 1 }}
     transition={{ delay, duration: 0.5 }}
     className={`${color} w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl shadow-2xl flex items-center justify-center border border-white/10 hover:scale-110 transition-transform cursor-pointer`}
   >
-    <span className={`text-[10px] md:text-xs font-black ${label === 'Snapchat' ? 'text-black' : 'text-white'}`}>{label[0]}</span>
+    <span className={`text-[10px] md:text-xs font-black text-white`}>{label[0]}</span>
   </motion.div>
 );
