@@ -5,7 +5,7 @@ a = Analysis(
     ['voicetype/main.py'],
     pathex=[],
     binaries=[],
-    datas=[('voicetype/ui', 'voicetype/ui'), ('voicetype/assets', 'voicetype/assets')],
+    datas=[('voicetype/assets', 'voicetype/assets')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -48,4 +48,10 @@ app = BUNDLE(
     name='Codiris Voice.app',
     icon='voicetype/assets/AppIcon.icns',
     bundle_identifier='com.codiris.voice',
+    info_plist={
+        'NSMicrophoneUsageDescription': 'Codiris Voice needs microphone access to transcribe your speech.',
+        'NSAppleEventsUsageDescription': 'Codiris Voice needs to control other applications to type transcribed text.',
+        'CFBundleShortVersionString': '1.0.9',
+        'LSUIElement': False,
+    },
 )

@@ -24,7 +24,8 @@ DEFAULT_CONFIG = {
     "launch_at_login": False,
     "bar_position": "bottom",  # bottom, top
     "bar_color": "#FFFFFF",  # wave color
-    "bar_y_offset": 60  # pixels from edge
+    "bar_y_offset": 60,  # pixels from edge
+    "toggle_mode": True  # True = press to start/stop, False = hold to record
 }
 
 # Store API key securely on first run

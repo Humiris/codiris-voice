@@ -7,7 +7,9 @@ from AppKit import (
     NSPanel, NSView, NSColor, NSBezierPath,
     NSWindowStyleMaskBorderless, NSWindowStyleMaskNonactivatingPanel,
     NSBackingStoreBuffered, NSTimer, NSScreen, NSMakeRect,
-    NSFloatingWindowLevel, NSMenu, NSMenuItem, NSApp
+    NSFloatingWindowLevel, NSMenu, NSMenuItem, NSApp,
+    NSFont, NSFontAttributeName, NSForegroundColorAttributeName,
+    NSMutableDictionary, NSAttributedString, NSMakePoint
 )
 import numpy as np
 import sounddevice as sd
@@ -250,6 +252,46 @@ class WaveformBarView(NSView):
 
         menu = NSMenu.alloc().init()
 
+        # Current mode display and mode selection submenu
+        try:
+            from voicetype.settings import load_config
+            config = load_config()
+            current_mode = config.get('mode', 'Raw')
+
+            # Mode submenu
+            mode_menu = NSMenu.alloc().init()
+            modes = ['Raw', 'Clean', 'Format', 'Email', 'Code', 'Notes', 'Super Prompt']
+            for mode in modes:
+                # Create action name without spaces
+                action_name = mode.replace(' ', '')
+                mode_item = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
+                    f"{'✓ ' if mode == current_mode else '   '}{mode}", f"setMode{action_name}:", ""
+                )
+                mode_item.setTarget_(self)
+                mode_menu.addItem_(mode_item)
+
+            # Add custom styles if any
+            custom_styles = config.get('custom_styles', [])
+            if custom_styles:
+                mode_menu.addItem_(NSMenuItem.separatorItem())
+                for style in custom_styles:
+                    is_active = current_mode == 'Custom' and config.get('custom_prompt') == style.get('systemPrompt')
+                    style_item = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
+                        f"{'✓ ' if is_active else '   '}{style['name']}", "setCustomMode:", ""
+                    )
+                    style_item.setTarget_(self)
+                    style_item.setRepresentedObject_(style)
+                    mode_menu.addItem_(style_item)
+
+            mode_submenu_item = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
+                f"AI Mode: {current_mode}", "", ""
+            )
+            mode_submenu_item.setSubmenu_(mode_menu)
+            menu.addItem_(mode_submenu_item)
+            menu.addItem_(NSMenuItem.separatorItem())
+        except Exception as e:
+            print(f"Error loading modes: {e}")
+
         # Settings option
         settings_item = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
             "Open Settings", "openSettings:", ""
@@ -305,6 +347,48 @@ class WaveformBarView(NSView):
     def disable60_(self, sender):
         disable_for(60)
 
+    def _set_mode(self, mode, custom_prompt=None):
+        """Set AI mode"""
+        try:
+            from voicetype.settings import load_config, save_config
+            config = load_config()
+            config['mode'] = mode
+            config['custom_prompt'] = custom_prompt
+            save_config(config)
+            print(f"Mode changed to: {mode}")
+            # Trigger resize of floating bar
+            bar = get_floating_bar()
+            bar.resize_for_mode()
+        except Exception as e:
+            print(f"Error setting mode: {e}")
+
+    def setModeRaw_(self, sender):
+        self._set_mode('Raw')
+
+    def setModeClean_(self, sender):
+        self._set_mode('Clean')
+
+    def setModeFormat_(self, sender):
+        self._set_mode('Format')
+
+    def setModeEmail_(self, sender):
+        self._set_mode('Email')
+
+    def setModeCode_(self, sender):
+        self._set_mode('Code')
+
+    def setModeNotes_(self, sender):
+        self._set_mode('Notes')
+
+    def setModeSuperPrompt_(self, sender):
+        self._set_mode('Super Prompt')
+
+    def setCustomMode_(self, sender):
+        """Set a custom mode from the menu"""
+        style = sender.representedObject()
+        if style:
+            self._set_mode('Custom', style.get('systemPrompt'))
+
     def drawRect_(self, rect):
         global _state, audio_levels
 
@@ -322,27 +406,52 @@ class WaveformBarView(NSView):
         pill_path.setLineWidth_(1.0)
         pill_path.stroke()
 
-        # Calculate waveform area (leave space for stop button when recording)
+        # Get current mode for display
+        current_mode = "Raw"
+        try:
+            from voicetype.settings import load_config
+            config = load_config()
+            current_mode = config.get('mode', 'Raw')
+        except:
+            pass
+
+        # Draw mode text on the left
+        font = NSFont.systemFontOfSize_(10)
+        attrs = NSMutableDictionary.alloc().init()
+        attrs[NSFontAttributeName] = font
+
+        # Mode text color - brighter when recording
+        if is_recording:
+            r, g, b = self.wave_color
+            attrs[NSForegroundColorAttributeName] = NSColor.colorWithCalibratedRed_green_blue_alpha_(r, g, b, 1.0)
+        else:
+            attrs[NSForegroundColorAttributeName] = NSColor.colorWithCalibratedRed_green_blue_alpha_(0.7, 0.7, 0.7, 1.0)
+
+        mode_str = NSAttributedString.alloc().initWithString_attributes_(current_mode, attrs)
+        mode_str.drawAtPoint_(NSMakePoint(10, (rect.size.height - 12) / 2))
+
+        # Calculate waveform area - position after mode text
         bar_width = 2
         gap = 2
-        num_bars = 12
-        total_width = num_bars * bar_width + (num_bars - 1) * gap
+        num_bars = 6  # Compact waveform
 
-        # Offset waveform to the left when recording to make room for stop button
+        # Dynamic waveform start based on text length
+        text_width = len(current_mode) * 7 + 15
+        waveform_start = text_width
         if is_recording:
-            start_x = 12
+            start_x = waveform_start
         else:
-            start_x = (rect.size.width - total_width) / 2
+            start_x = waveform_start + 5
 
         center_y = rect.size.height / 2
-        max_height = rect.size.height * 0.6
+        max_height = rect.size.height * 0.5
 
         # Draw waveform bars
         for i in range(num_bars):
             x = start_x + i * (bar_width + gap)
 
             height_pct = self.wave_heights[i]
-            bar_height = max(4, height_pct * max_height)
+            bar_height = max(3, height_pct * max_height)
             y = center_y - bar_height / 2
 
             # Color based on state - use custom color
@@ -363,8 +472,8 @@ class WaveformBarView(NSView):
 
         # Draw stop button when recording (red square on right side)
         if is_recording:
-            stop_size = 14
-            stop_x = rect.size.width - stop_size - 10
+            stop_size = 12
+            stop_x = rect.size.width - stop_size - 8
             stop_y = center_y - stop_size / 2
 
             # Red stop square
@@ -405,15 +514,55 @@ class FloatingBar:
         self.window = None
         self.view = None
         self.timer = None
+        self.current_width = 120
         self._create_window()
+
+    def _get_width_for_mode(self, mode_name):
+        """Calculate bar width based on mode name length"""
+        # Base width for waveform + padding
+        base_width = 70
+        # Add width for text (approximately 7px per character)
+        text_width = len(mode_name) * 7
+        return base_width + text_width
+
+    def resize_for_mode(self):
+        """Resize the bar based on current mode"""
+        try:
+            from voicetype.settings import load_config
+            config = load_config()
+            current_mode = config.get('mode', 'Raw')
+            new_width = self._get_width_for_mode(current_mode)
+
+            if self.window and new_width != self.current_width:
+                self.current_width = new_width
+                screen = NSScreen.mainScreen()
+                screen_frame = screen.frame()
+                x = (screen_frame.size.width - new_width) / 2
+                y = self.window.frame().origin.y
+
+                self.window.setFrame_display_(
+                    NSMakeRect(x, y, new_width, 24),
+                    True
+                )
+                self.view.setFrame_(NSMakeRect(0, 0, new_width, 24))
+        except Exception as e:
+            print(f"Resize error: {e}")
 
     def _create_window(self):
         screen = NSScreen.mainScreen()
         screen_frame = screen.frame()
 
-        # Bar dimensions (compact)
-        bar_width = 100
-        bar_height = 20
+        # Get initial width based on current mode
+        try:
+            from voicetype.settings import load_config
+            config = load_config()
+            current_mode = config.get('mode', 'Raw')
+            bar_width = self._get_width_for_mode(current_mode)
+        except:
+            bar_width = 120
+
+        self.current_width = bar_width
+        bar_height = 24
 
         # Position higher to avoid dock (120px from bottom)
         x = (screen_frame.size.width - bar_width) / 2

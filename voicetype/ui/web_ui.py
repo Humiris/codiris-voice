@@ -683,6 +683,32 @@ HTML_CONTENT = '''
             font-size: 13px;
             color: #666;
         }
+        .ai-mode {
+            position: relative;
+        }
+        .hide-mode-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 20px;
+            height: 20px;
+            border: none;
+            background: #eee;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            color: #888;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .ai-mode:hover .hide-mode-btn {
+            opacity: 1;
+        }
+        .hide-mode-btn:hover {
+            background: #fee;
+            color: #c00;
+        }
 
         /* Custom Styles Section */
         .custom-styles-header {
@@ -752,11 +778,6 @@ HTML_CONTENT = '''
             right: 8px;
             display: flex;
             gap: 4px;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        .custom-style:hover .custom-style-actions {
-            opacity: 1;
         }
         .custom-style-actions button {
             padding: 4px;
@@ -1465,40 +1486,25 @@ HTML_CONTENT = '''
 
             <div class="section-card">
                 <h3>Select Mode</h3>
-                <div class="ai-modes-grid">
-                    <div class="ai-mode active" onclick="selectMode('Raw', this)">
-                        <h4>Raw</h4>
-                        <p>No processing - exact transcription of your speech</p>
-                    </div>
-                    <div class="ai-mode" onclick="selectMode('Clean', this)">
-                        <h4>Clean</h4>
-                        <p>Fix grammar, punctuation, and capitalization</p>
-                    </div>
-                    <div class="ai-mode" onclick="selectMode('Format', this)">
-                        <h4>Format</h4>
-                        <p>Professional formatting with proper structure</p>
-                    </div>
-                    <div class="ai-mode" onclick="selectMode('Email', this)">
-                        <h4>Email</h4>
-                        <p>Convert speech into professional email format</p>
-                    </div>
-                    <div class="ai-mode" onclick="selectMode('Code', this)">
-                        <h4>Code</h4>
-                        <p>Format as code comments or documentation</p>
-                    </div>
-                    <div class="ai-mode" onclick="selectMode('Notes', this)">
-                        <h4>Notes</h4>
-                        <p>Structure as meeting notes with bullet points</p>
-                    </div>
+                <div class="ai-modes-grid" id="defaultModesGrid">
+                    <!-- Default modes will be rendered here -->
                 </div>
+                <p id="noDefaultModes" style="color: #888; font-size: 13px; margin-top: 12px; display: none;">
+                    All default modes are hidden. <a href="#" onclick="showAllModes(); return false;">Show all modes</a>
+                </p>
 
                 <!-- Custom Styles Section -->
                 <div style="margin-top: 24px;">
                     <div class="custom-styles-header">
                         <h4>Custom Styles</h4>
-                        <button class="add-custom-btn" onclick="openCustomStyleModal()">
-                            <span>+</span> Add Custom
-                        </button>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="add-custom-btn" onclick="openCustomStyleModal()">
+                                <span>+</span> Add Custom
+                            </button>
+                            <button class="add-custom-btn" style="background: #fee; color: #c00; border-color: #fcc;" onclick="clearAllCustomStyles()">
+                                🗑️ Clear All
+                            </button>
+                        </div>
                     </div>
                     <div class="custom-styles-grid" id="customStylesGrid">
                         <!-- Custom styles will be rendered here -->
@@ -1741,9 +1747,19 @@ HTML_CONTENT = '''
                     <div class="setting-item">
                         <div>
                             <div class="setting-label">Activation Key</div>
-                            <div class="setting-desc">Currently using fn/globe key</div>
+                            <div class="setting-desc">Currently using Option key</div>
                         </div>
-                        <span style="color: #2f0df4; font-weight: 600;">fn (🌐)</span>
+                        <span style="color: #2f0df4; font-weight: 600;">⌥ Option</span>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Recording Mode</div>
+                            <div class="setting-desc">How the hotkey controls recording</div>
+                        </div>
+                        <select id="toggleMode" onchange="updateToggleMode(this.value)">
+                            <option value="toggle">Press to Start/Stop (better for long recordings)</option>
+                            <option value="hold">Hold to Record (release to stop)</option>
+                        </select>
                     </div>
                 </div>
 
@@ -2156,6 +2172,23 @@ HTML_CONTENT = '''
                     if (data.bar_position) {
                         document.getElementById('barPosition').value = data.bar_position;
                     }
+                    // Toggle mode: true = press to start/stop, false = hold to record
+                    const toggleModeSelect = document.getElementById('toggleMode');
+                    if (toggleModeSelect) {
+                        toggleModeSelect.value = data.toggle_mode !== false ? 'toggle' : 'hold';
+                    }
+                    // Set the active AI mode
+                    if (data.mode) {
+                        currentMode = data.mode;
+                    }
+                    // Load hidden modes and render default modes
+                    hiddenModes = data.hidden_modes || [];
+                    renderDefaultModes();
+                    // Load custom styles
+                    if (data.custom_styles) {
+                        customStyles = data.custom_styles;
+                        renderCustomStyles();
+                    }
                 });
         }
 
@@ -2199,25 +2232,95 @@ HTML_CONTENT = '''
             });
         }
 
+        // Default Modes Management
+        const defaultModes = [
+            { id: 'Raw', name: 'Raw', desc: 'No processing - exact transcription of your speech' },
+            { id: 'Clean', name: 'Clean', desc: 'Fix grammar, punctuation, and capitalization' },
+            { id: 'Format', name: 'Format', desc: 'Professional formatting with proper structure' },
+            { id: 'Email', name: 'Email', desc: 'Convert speech into professional email format' },
+            { id: 'Code', name: 'Code', desc: 'Format as code comments or documentation' },
+            { id: 'Notes', name: 'Notes', desc: 'Structure as meeting notes with bullet points' },
+            { id: 'Super Prompt', name: 'Super Prompt', desc: 'Transform speech into powerful AI prompts' }
+        ];
+        let hiddenModes = [];
+
+        function renderDefaultModes() {
+            const grid = document.getElementById('defaultModesGrid');
+            const noModesMsg = document.getElementById('noDefaultModes');
+            const visibleModes = defaultModes.filter(m => !hiddenModes.includes(m.id));
+
+            if (visibleModes.length === 0) {
+                grid.innerHTML = '';
+                noModesMsg.style.display = 'block';
+                return;
+            }
+
+            noModesMsg.style.display = 'none';
+            grid.innerHTML = visibleModes.map(mode => `
+                <div class="ai-mode ${currentMode === mode.id ? 'active' : ''}" onclick="selectMode('${mode.id}', this)">
+                    <h4>${mode.name}</h4>
+                    <p>${mode.desc}</p>
+                    <button class="hide-mode-btn" onclick="event.stopPropagation(); hideMode('${mode.id}')" title="Hide this mode">×</button>
+                </div>
+            `).join('');
+        }
+
+        function hideMode(modeId) {
+            if (!hiddenModes.includes(modeId)) {
+                hiddenModes.push(modeId);
+                saveHiddenModes();
+                renderDefaultModes();
+
+                // If hiding current mode, switch to first visible or Raw
+                if (currentMode === modeId) {
+                    const visibleModes = defaultModes.filter(m => !hiddenModes.includes(m.id));
+                    if (visibleModes.length > 0) {
+                        selectMode(visibleModes[0].id, null);
+                    }
+                }
+            }
+        }
+
+        function showAllModes() {
+            hiddenModes = [];
+            saveHiddenModes();
+            renderDefaultModes();
+        }
+
+        function saveHiddenModes() {
+            fetch('/set-setting', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: 'hidden_modes', value: hiddenModes })
+            });
+        }
+
         // Custom Styles Management
         let customStyles = [];
         let editingStyleId = null;
 
         function loadCustomStyles() {
-            const saved = localStorage.getItem('customStyles');
-            if (saved) {
-                try {
-                    customStyles = JSON.parse(saved);
-                } catch (e) {
-                    console.error('Failed to parse custom styles:', e);
+            // Load from server (already fetched in loadSettings)
+            fetch('/get-settings')
+                .then(r => r.json())
+                .then(data => {
+                    customStyles = data.custom_styles || [];
+                    renderCustomStyles();
+                })
+                .catch(e => {
+                    console.error('Failed to load custom styles:', e);
                     customStyles = [];
-                }
-            }
-            renderCustomStyles();
+                    renderCustomStyles();
+                });
         }
 
         function saveCustomStylesToStorage() {
-            localStorage.setItem('customStyles', JSON.stringify(customStyles));
+            // Save to server
+            fetch('/custom-styles', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ styles: customStyles })
+            }).catch(e => console.error('Failed to save custom styles:', e));
         }
 
         function renderCustomStyles() {
@@ -2333,17 +2436,38 @@ HTML_CONTENT = '''
         }
 
         function deleteCustomStyle(styleId) {
-            if (confirm('Are you sure you want to delete this custom style?')) {
-                customStyles = customStyles.filter(s => s.id !== styleId);
-                saveCustomStylesToStorage();
-                renderCustomStyles();
+            // Delete directly without confirmation
+            customStyles = customStyles.filter(s => s.id !== styleId);
+            saveCustomStylesToStorage();
+            renderCustomStyles();
 
-                // If this was the active style, reset to Raw
-                if (currentMode === 'Custom_' + styleId) {
-                    const rawElement = document.querySelector('.ai-mode');
-                    if (rawElement) selectMode('Raw', rawElement);
-                }
+            // If this was the active style, reset to Raw
+            if (currentMode === 'Custom_' + styleId) {
+                currentMode = 'Raw';
+                renderDefaultModes();
             }
+        }
+
+        function clearAllCustomStyles() {
+            // Delete from server directly
+            fetch('/delete-custom-styles', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            }).then(response => {
+                if (response.ok) {
+                    customStyles = [];
+                    localStorage.removeItem('customStyles');
+                    renderCustomStyles();
+
+                    // Reset to Raw mode if using a custom style
+                    if (currentMode.startsWith('Custom_')) {
+                        currentMode = 'Raw';
+                        renderDefaultModes();
+                    }
+                }
+            }).catch(e => {
+                console.error('Failed to delete:', e);
+            });
         }
 
         // Load custom styles on page load
@@ -2388,6 +2512,17 @@ HTML_CONTENT = '''
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ key: 'bar_color', value: value })
+            });
+        }
+
+        function updateToggleMode(value) {
+            const isToggle = value === 'toggle';
+            fetch('/set-setting', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: 'toggle_mode', value: isToggle })
+            }).then(() => {
+                alert('Recording mode updated! Changes will apply on next recording.');
             });
         }
 
@@ -3268,7 +3403,11 @@ class WebUIHandler(http.server.SimpleHTTPRequestHandler):
                 'assemblyai_api_key': config.get('assemblyai_api_key', ''),
                 'language': config.get('language', 'auto'),
                 'bar_position': config.get('bar_position', 'top'),
-                'bar_color': config.get('bar_color', '#FFFFFF')
+                'bar_color': config.get('bar_color', '#FFFFFF'),
+                'toggle_mode': config.get('toggle_mode', True),
+                'custom_styles': config.get('custom_styles', []),
+                'mode': config.get('mode', 'Raw'),
+                'hidden_modes': config.get('hidden_modes', [])
             }
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
@@ -3353,6 +3492,29 @@ class WebUIHandler(http.server.SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({'success': True}).encode())
+        elif self.path == '/custom-styles':
+            # Save custom styles to server
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode())
+            from voicetype.settings import load_config, save_config
+            config = load_config()
+            config['custom_styles'] = data.get('styles', [])
+            save_config(config)
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({'success': True}).encode())
+        elif self.path == '/delete-custom-styles':
+            # Delete all custom styles
+            from voicetype.settings import load_config, save_config
+            config = load_config()
+            config['custom_styles'] = []
+            save_config(config)
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps({'success': True}).encode())
         elif self.path == '/set-mode':

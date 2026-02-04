@@ -132,7 +132,7 @@ class VoiceTypeApp(rumps.App):
 
         # Setup mode menu
         self.mode_menu = rumps.MenuItem("Transcription Mode")
-        self.modes = ["Raw", "Clean", "Format", "Email", "Code", "Notes"]
+        self.modes = ["Raw", "Clean", "Format", "Email", "Code", "Notes", "Super Prompt"]
         self.mode_items = {}
         for mode in self.modes:
             item = rumps.MenuItem(mode, callback=self.change_mode)
@@ -159,10 +159,13 @@ class VoiceTypeApp(rumps.App):
         ]
 
         # Start hotkey listener - callbacks will set flags that timer checks
+        # Toggle mode: press Option to start, press again to stop (better for longer recordings)
+        toggle_mode = self.config.get("toggle_mode", True)
         self.hotkey_listener = HotkeyListener(
             self.config["hotkey"],
             self._queue_press,
-            self._queue_release
+            self._queue_release,
+            toggle_mode=toggle_mode
         )
         self.hotkey_listener.start()
 
@@ -373,40 +376,37 @@ class VoiceTypeApp(rumps.App):
                 if is_command:
                     self.injector.inject_text(text, to_clipboard=False)
                     add_to_history(text)
+                elif self.config["mode"] == "Raw":
+                    # Raw mode - paste immediately, no review
+                    self.injector.inject_text(text, to_clipboard=self.config.get("clipboard_mode", False))
+                    add_to_history(text)
                 else:
-                    # PASTE ORIGINAL TEXT IMMEDIATELY - no waiting!
+                    # Format mode - paste ORIGINAL immediately, then show review window
                     original_text = text
-                    print(f"Pasting original text immediately: {original_text}")
                     self.injector.inject_text(original_text, to_clipboard=self.config.get("clipboard_mode", False))
                     add_to_history(original_text)
 
-                    # Generate improved version in background and show as suggestion
-                    if self.config["mode"] != "Raw":
-                        custom_prompt = self.config.get("custom_prompt")
-                        refined_text = self.enhancer.enhance(text, mode=self.config["mode"], custom_prompt=custom_prompt)
+                    # Generate improved version and show as suggestion
+                    custom_prompt = self.config.get("custom_prompt")
+                    refined_text = self.enhancer.enhance(text, mode=self.config["mode"], custom_prompt=custom_prompt)
 
-                        # Map mode to style
-                        style_map = {
-                            "Format": "professional",
-                            "Clean": "casual",
-                            "Notes": "concise"
-                        }
-                        current_style = style_map.get(self.config["mode"], "professional")
+                    # Use the actual mode name as the style
+                    current_style = self.config["mode"]
 
-                        print(f"DEBUG: Queueing suggestion bubble for main thread")
-                        print(f"DEBUG: Original: {original_text[:50] if len(original_text) > 50 else original_text}")
-                        print(f"DEBUG: Improved: {refined_text[:50] if len(refined_text) > 50 else refined_text}")
-                        print(f"DEBUG: Style: {current_style}")
+                    print(f"DEBUG: Queueing suggestion bubble for main thread")
+                    print(f"DEBUG: Original: {original_text[:50] if len(original_text) > 50 else original_text}")
+                    print(f"DEBUG: Improved: {refined_text[:50] if len(refined_text) > 50 else refined_text}")
+                    print(f"DEBUG: Style: {current_style}")
 
-                        # Queue bubble to be shown on main thread (just to show suggestion)
-                        global _pending_review_data
-                        _pending_review_data = {
-                            'original_text': original_text,
-                            'refined_text': refined_text,
-                            'style': current_style,
-                            'on_accept': None  # No callback needed - already pasted
-                        }
-                        _pending_actions.append("show_review")
+                    # Queue bubble to be shown on main thread
+                    global _pending_review_data
+                    _pending_review_data = {
+                        'original_text': original_text,
+                        'refined_text': refined_text,
+                        'style': current_style,
+                        'on_accept': None
+                    }
+                    _pending_actions.append("show_review")
 
             if os.path.exists(file_path):
                 os.remove(file_path)
