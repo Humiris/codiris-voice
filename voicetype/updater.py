@@ -2,7 +2,7 @@ import requests
 import threading
 from packaging import version
 
-CURRENT_VERSION = "1.0.5"
+CURRENT_VERSION = "1.2.1"
 GITHUB_API_URL = "https://api.github.com/repos/Humiris/codiris-voice/releases/latest"
 DOWNLOAD_URL = "https://voice.codiris.build/Codiris-Voice.dmg"
 

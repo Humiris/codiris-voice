@@ -37,50 +37,86 @@ def check_accessibility_permission():
         return False
 
 
-def check_microphone_permission():
-    """Check if we have Microphone permissions and prompt if not"""
+def check_input_monitoring_permission():
+    """Check if we have Input Monitoring permissions and prompt if not"""
     try:
-        from AVFoundation import AVCaptureDevice, AVMediaTypeAudio
-        from AVFoundation import AVAuthorizationStatusAuthorized, AVAuthorizationStatusNotDetermined, AVAuthorizationStatusDenied
+        # Input Monitoring permission is required for global keyboard monitoring
+        # There's no direct API to check this, but we can try to use IOHIDManager
+        # If it fails, we need to prompt the user to enable Input Monitoring
+        from Quartz import (
+            CGEventTapCreate, kCGSessionEventTap, kCGHeadInsertEventTap,
+            kCGEventTapOptionListenOnly, CGEventMaskBit, kCGEventKeyDown
+        )
 
-        status = AVCaptureDevice.authorizationStatusForMediaType_(AVMediaTypeAudio)
-        print(f"[Main] Microphone authorization status: {status}")
+        # Try to create an event tap - this will fail if we don't have permission
+        mask = CGEventMaskBit(kCGEventKeyDown)
+        tap = CGEventTapCreate(
+            kCGSessionEventTap,
+            kCGHeadInsertEventTap,
+            kCGEventTapOptionListenOnly,
+            mask,
+            lambda *args: None,
+            None
+        )
 
-        if status == AVAuthorizationStatusAuthorized:
-            print("[Main] Microphone permission already granted")
+        if tap is None:
+            print("[Main] Input Monitoring permission not granted, opening System Settings...")
+            subprocess.run([
+                'open', 'x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent'
+            ])
+            return False
+
+        print("[Main] Input Monitoring permission granted")
+        return True
+
+    except Exception as e:
+        print(f"[Main] Could not check Input Monitoring: {e}")
+        # Open System Settings as fallback
+        subprocess.run([
+            'open', 'x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent'
+        ])
+        return False
+
+
+def check_microphone_permission():
+    """Check if we have Microphone permissions and prompt if not.
+    Actually tries to access the microphone to trigger macOS permission dialog."""
+    try:
+        import sounddevice as sd
+        import numpy as np
+
+        print("[Main] Attempting to access microphone to trigger permission dialog...")
+
+        # Try to record a tiny sample - this WILL trigger the macOS permission dialog
+        # if permission hasn't been granted yet
+        try:
+            # Record just 0.1 seconds at low sample rate
+            test_recording = sd.rec(int(0.1 * 16000), samplerate=16000, channels=1, dtype='float32')
+            sd.wait()  # Wait for recording to finish
+            print("[Main] Microphone access successful!")
             return True
-        elif status == AVAuthorizationStatusNotDetermined:
-            print("[Main] Requesting microphone permission...")
-            # Request permission - this triggers the system dialog
-            import threading
-            event = threading.Event()
-            result = [False]
-
-            def callback(granted):
-                result[0] = granted
-                print(f"[Main] Microphone permission callback: granted={granted}")
-                event.set()
-
-            AVCaptureDevice.requestAccessForMediaType_completionHandler_(AVMediaTypeAudio, callback)
-            event.wait(timeout=60)  # Wait up to 60 seconds for user response
-
-            if result[0]:
-                print("[Main] Microphone permission granted!")
+        except sd.PortAudioError as e:
+            error_str = str(e)
+            print(f"[Main] Microphone access error: {error_str}")
+            if "Input overflowed" in error_str:
+                # This actually means we have access, just buffer overflow
                 return True
-            else:
-                print("[Main] Microphone permission denied by user")
-                return False
-        else:
-            # Permission was denied previously
-            print("[Main] Microphone permission denied, opening System Settings...")
+            # Permission denied or no microphone
+            print("[Main] Opening System Settings for Microphone...")
+            subprocess.run([
+                'open', 'x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone'
+            ])
+            return False
+        except Exception as e:
+            print(f"[Main] Microphone test failed: {e}")
             subprocess.run([
                 'open', 'x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone'
             ])
             return False
 
     except ImportError as e:
-        print(f"[Main] Could not import AVFoundation: {e}")
-        return True  # Allow to continue, will fail later if no permission
+        print(f"[Main] Could not import sounddevice: {e}")
+        return True
     except Exception as e:
         print(f"[Main] Error checking microphone permission: {e}")
         return True
@@ -452,8 +488,11 @@ if __name__ == "__main__":
         import sys
         sys.exit(0)
 
-    # Check microphone permission first - this triggers the system permission dialog
-    print("[Main] Checking microphone permission...")
+    # Check all 3 permissions on startup
+    print("[Main] Checking all required permissions...")
+
+    # 1. Check microphone permission - triggers the system permission dialog
+    print("[Main] 1/3 Checking microphone permission...")
     has_microphone = check_microphone_permission()
     if not has_microphone:
         print("=" * 50)
@@ -467,7 +506,23 @@ if __name__ == "__main__":
             "Please enable in System Settings > Privacy & Security > Microphone"
         )
 
-    # Check accessibility permissions
+    # 2. Check Input Monitoring permission - needed for global hotkey detection
+    print("[Main] 2/3 Checking Input Monitoring permission...")
+    has_input_monitoring = check_input_monitoring_permission()
+    if not has_input_monitoring:
+        print("=" * 50)
+        print("INPUT MONITORING PERMISSION REQUIRED")
+        print("Please enable this app in System Settings > Privacy & Security > Input Monitoring")
+        print("Then restart the app.")
+        print("=" * 50)
+        rumps.notification(
+            "Codiris Voice",
+            "Input Monitoring Permission Required",
+            "Please enable in System Settings > Privacy & Security > Input Monitoring"
+        )
+
+    # 3. Check Accessibility permission - needed for typing text
+    print("[Main] 3/3 Checking Accessibility permission...")
     has_accessibility = check_accessibility_permission()
     if not has_accessibility:
         print("=" * 50)
@@ -480,6 +535,12 @@ if __name__ == "__main__":
             "Accessibility Permission Required",
             "Please enable in System Settings > Privacy & Security > Accessibility"
         )
+
+    # Summary
+    if has_microphone and has_input_monitoring and has_accessibility:
+        print("[Main] All permissions granted!")
+    else:
+        print("[Main] Some permissions missing - app may not work correctly")
 
     # Start web UI server in background
     start_web_ui()

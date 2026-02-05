@@ -84,8 +84,8 @@ app = BUNDLE(
     info_plist={
         'CFBundleName': 'Codiris Voice',
         'CFBundleDisplayName': 'Codiris Voice',
-        'CFBundleVersion': '1.0.0',
-        'CFBundleShortVersionString': '1.0.0',
+        'CFBundleVersion': '1.2.1',
+        'CFBundleShortVersionString': '1.2.1',
         'LSMinimumSystemVersion': '10.15',
         'LSUIElement': False,
         'NSMicrophoneUsageDescription': 'Codiris Voice needs microphone access to transcribe your speech.',

@@ -55,8 +55,8 @@ def request_microphone_permission():
         print(f"[Audio] Error requesting microphone permission: {e}")
         return True
 
-# Maximum recording duration in seconds (2 minutes)
-MAX_RECORDING_SECONDS = 120
+# Maximum recording duration in seconds (5 minutes)
+MAX_RECORDING_SECONDS = 300
 # Chunk size for processing (30 seconds worth of samples)
 CHUNK_SECONDS = 30
 

@@ -4,8 +4,8 @@ import threading
 import base64
 import requests
 
-# Timeout for API calls (in seconds)
-API_TIMEOUT = 60
+# Timeout for API calls (in seconds) - increased for long recordings
+API_TIMEOUT = 180
 # Maximum file size for APIs (in bytes) - 25MB for OpenAI
 MAX_FILE_SIZE = 25 * 1024 * 1024
 
