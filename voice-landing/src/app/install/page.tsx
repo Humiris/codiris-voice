@@ -176,15 +176,15 @@ export default function InstallPage() {
                   <ul className="space-y-3 text-slate-700">
                     <li className="flex items-center gap-2">
                       <span className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm flex-shrink-0">1</span>
-                      <span>Hold down the <kbd className="bg-slate-100 px-3 py-1 rounded border border-slate-300 font-mono font-semibold">⌥ Option</kbd> key to start recording</span>
+                      <span>Tap <kbd className="bg-slate-100 px-3 py-1 rounded border border-slate-300 font-mono font-semibold">⌥ Option</kbd> to start recording</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm flex-shrink-0">2</span>
-                      <span>Speak your message while holding the key</span>
+                      <span>Speak your message freely</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm flex-shrink-0">3</span>
-                      <span>Release <kbd className="bg-slate-100 px-3 py-1 rounded border border-slate-300 font-mono font-semibold">⌥ Option</kbd> to stop and transcribe</span>
+                      <span>Tap <kbd className="bg-slate-100 px-3 py-1 rounded border border-slate-300 font-mono font-semibold">⌥ Option</kbd> again to stop and transcribe</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm flex-shrink-0">4</span>

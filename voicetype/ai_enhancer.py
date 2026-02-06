@@ -207,25 +207,58 @@ class AIEnhancer:
             print(f"Super Prompt context: {context} (app: {app_name})")
 
             if context == 'ide':
-                # Technical/coding context - generate code-focused prompts
-                super_prompt_system = """You are an expert technical prompt engineer for developers. Transform casual speech into precise, technical prompts for coding AI assistants.
+                # Technical/coding context - generate DETAILED code prompts
+                super_prompt_system = """You are an ELITE PROMPT ENGINEER for developers. Transform short coding requests into COMPREHENSIVE, DETAILED prompts that will get excellent code from AI assistants.
 
-Your task: Take the developer's rough idea and create an effective prompt for coding tasks.
+YOUR MISSION: Take a simple coding idea and expand it into a professional, detailed prompt.
 
-Rules:
-1. Keep the SAME LANGUAGE as the input
-2. Be TECHNICAL and SPECIFIC - use proper programming terminology
-3. Include relevant technical context (language, framework, patterns)
-4. Specify expected code format, style, and best practices
-5. Mention error handling, edge cases, or performance considerations if relevant
-6. Output ONLY the final prompt, no explanations
+IMPORTANT FORMATTING:
+- DO NOT use markdown (no asterisks **, no bold, no headers)
+- Use plain text with clear sections separated by blank lines
+- Use simple dashes (-) for bullet points
+- Use UPPERCASE for section titles
 
-Format for code prompts:
-- Start with the specific task/goal
-- Mention language/framework if implied
-- Include constraints (performance, compatibility, style)
-- Specify what kind of code is expected (function, class, script, etc.)
-- Ask for comments/documentation if complex"""
+EXPANSION RULES:
+1. Keep the SAME LANGUAGE as input
+2. EXPAND short requests into detailed specifications
+3. Add technical requirements the user probably wants but didn't say
+4. Include best practices, error handling, edge cases
+5. Specify code quality standards
+
+FOR EVERY CODE REQUEST, ADD:
+- Clear task description with context
+- Programming language/framework specifics
+- Code structure expectations (functions, classes, modules)
+- Error handling requirements
+- Performance considerations if relevant
+- Request for clean, well-commented code
+- Request for TypeScript types if JS/TS
+- Request for proper naming conventions
+
+EXAMPLE:
+Input: "create a landing page"
+Output: "Create a modern, responsive landing page with these requirements:
+
+STRUCTURE
+- Hero section with headline and CTA
+- Features section with grid layout
+- Testimonials/social proof section
+- Footer with links
+
+TECHNICAL
+- React/Next.js with TypeScript
+- Tailwind CSS for styling
+- Responsive design (mobile-first)
+- Smooth animations with Framer Motion
+- SEO meta tags included
+
+CODE QUALITY
+- Clean, modular components
+- Proper TypeScript types
+- Comments for complex logic
+- Accessible (ARIA labels)"
+
+OUTPUT: Return ONLY the enhanced prompt in plain text. No markdown, no asterisks."""
 
             elif context == 'communication':
                 # Slack, email, messaging - casual, conversational prompts
@@ -268,25 +301,63 @@ Format:
 - Specify length if relevant"""
 
             else:
-                # General context - balanced, versatile prompts
-                super_prompt_system = """You are an expert prompt engineer. Transform casual speech into powerful, effective AI prompts.
+                # General context - EXPAND into detailed prompts
+                super_prompt_system = """You are an ELITE PROMPT ENGINEER. Transform SHORT requests into DETAILED, COMPREHENSIVE prompts that get exceptional results from any AI.
 
-Your task: Take the user's rough idea and create a professional, detailed prompt that will get excellent results from any AI.
+YOUR MISSION: Take a simple idea and expand it into a professional, detailed prompt.
 
-Rules:
-1. Keep the SAME LANGUAGE as the input
-2. Structure the prompt clearly with sections if needed
-3. Be specific about what's wanted
-4. Include context, constraints, and desired output format
-5. Make it actionable and clear
-6. Don't add unnecessary complexity - keep it focused
-7. Output ONLY the final prompt, no explanations
+IMPORTANT FORMATTING:
+- DO NOT use markdown (no asterisks **, no bold, no headers)
+- Use plain text with clear sections separated by blank lines
+- Use simple dashes (-) for bullet points
+- Use UPPERCASE for section titles
 
-Format the prompt to be:
-- Clear and specific about the goal
-- Well-structured (use markdown if helpful)
-- Include any constraints or requirements mentioned
-- Specify the desired output format when relevant"""
+EXPANSION RULES:
+1. Keep the SAME LANGUAGE as input
+2. EXPAND short requests into detailed specifications
+3. Add structure, requirements, and quality standards
+4. Include format expectations and constraints
+5. Make it specific and actionable
+
+FOR CONTENT REQUESTS, ADD:
+- Target audience and tone
+- Structure/sections needed
+- Length expectations
+- Style guidelines
+- Specific examples to include
+
+FOR CREATIVE REQUESTS, ADD:
+- Visual style/aesthetic
+- Key elements to include
+- Quality standards
+- Format requirements
+
+EXAMPLE:
+Input: "write a newsletter about AI"
+Output: "Write an engaging newsletter about AI with these specifications:
+
+STRUCTURE
+- Catchy subject line (under 50 chars)
+- Opening hook that grabs attention
+- 3 main sections with clear headers
+- Actionable takeaways for readers
+- Call-to-action at the end
+
+CONTENT
+- Latest AI trends and news
+- Practical tips readers can use
+- One interesting case study or example
+- Links to resources for learning more
+
+STYLE
+- Conversational but professional
+- Short paragraphs (2-3 sentences max)
+- Use bullet points for scanability
+- Include 1-2 relevant statistics
+
+LENGTH: 500-700 words"
+
+OUTPUT: Return ONLY the enhanced prompt in plain text. No markdown, no asterisks."""
 
             try:
                 response = self.client.chat.completions.create(
@@ -301,6 +372,21 @@ Format the prompt to be:
                 print(f"Super Prompt enhancement failed: {e}")
                 return text
 
+        # Special handling for Ask Me mode - act as a helpful AI assistant
+        if mode == "Ask Me":
+            try:
+                response = self.client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[
+                        {"role": "system", "content": "You are a helpful AI assistant. The user will ask you to do something - write content, answer questions, generate ideas, etc. Do exactly what they ask. Keep your response concise and directly useful. Keep the SAME LANGUAGE as the input."},
+                        {"role": "user", "content": text}
+                    ]
+                )
+                return response.choices[0].message.content.strip()
+            except Exception as e:
+                print(f"Ask Me mode failed: {e}")
+                return text
+
         system_prompt = "You are a helpful assistant that cleans up and formats voice transcriptions. IMPORTANT: Keep the SAME LANGUAGE as the input. If the text is in French, respond in French. If in English, respond in English. Never translate. You only return the final text, no explanations."
 
         prompts = {
@@ -308,7 +394,9 @@ Format the prompt to be:
             "Format": f"Format this transcription professionally. Fix grammar and punctuation. Keep the same language:\n\n{text}",
             "Email": f"Format this as a clear, professional email. Keep it concise and natural. Only add a greeting if the context suggests one is needed. Keep the same language as the input:\n\n{text}",
             "Code": f"Format this as concise code comments or documentation. Use # for Python/Ruby or // for JS/C++/Java style where appropriate. Keep the same language:\n\n{text}",
-            "Notes": f"Format this as structured meeting notes using bullet points for key actions and takeaways. Keep the same language:\n\n{text}"
+            "Notes": f"Format this as structured meeting notes using bullet points for key actions and takeaways. Keep the same language:\n\n{text}",
+            "Translate": f"Translate this text to English. If it's already in English, translate it to French. Make the translation natural and fluent, preserving the meaning and tone. Only return the translated text:\n\n{text}",
+            "Ask Me": text  # Pass directly as a request to the AI
         }
 
         user_prompt = prompts.get(mode, prompts["Clean"])

@@ -46,7 +46,10 @@ interface CustomStyle {
 const DEFAULT_STYLES = [
   { value: "professional", label: "Professional", desc: "Formal and clear" },
   { value: "casual", label: "Casual", desc: "Friendly tone" },
-  { value: "concise", label: "Concise", desc: "Brief and direct" }
+  { value: "concise", label: "Concise", desc: "Brief and direct" },
+  { value: "translate", label: "Translate", desc: "Translate to another language" },
+  { value: "askme", label: "Ask Me", desc: "Ask AI to do anything" },
+  { value: "superprompt", label: "Super Prompt", desc: "Expand into detailed prompt" }
 ];
 
 export function VoiceAI() {

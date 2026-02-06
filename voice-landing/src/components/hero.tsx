@@ -5,16 +5,25 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
-// Pre-written email for iOS waitlist
-const WAITLIST_EMAIL = "joel@codiris.build";
-const WAITLIST_SUBJECT = "I'd like to try Codiris Voice on iPhone!";
-const WAITLIST_BODY = `Hi!
+// Pre-written emails for waitlists
+const WAITLIST_EMAIL = "support@codiris.build";
+
+const IOS_SUBJECT = "I'd like to try Codiris Voice on iPhone!";
+const IOS_BODY = `Hi!
 
 I'd love to try Codiris Voice on my iPhone. Please add me to the iOS waitlist!
 
 Thanks!`;
 
-const mailtoLink = `mailto:${WAITLIST_EMAIL}?subject=${encodeURIComponent(WAITLIST_SUBJECT)}&body=${encodeURIComponent(WAITLIST_BODY)}`;
+const WINDOWS_SUBJECT = "I'd like to try Codiris Voice on Windows!";
+const WINDOWS_BODY = `Hi!
+
+I'd love to try Codiris Voice on Windows. Please add me to the Windows waitlist!
+
+Thanks!`;
+
+const iosMailtoLink = `mailto:${WAITLIST_EMAIL}?subject=${encodeURIComponent(IOS_SUBJECT)}&body=${encodeURIComponent(IOS_BODY)}`;
+const windowsMailtoLink = `mailto:${WAITLIST_EMAIL}?subject=${encodeURIComponent(WINDOWS_SUBJECT)}&body=${encodeURIComponent(WINDOWS_BODY)}`;
 
 // Pre-computed waveform heights to avoid hydration mismatch
 const waveformBars = [
@@ -81,17 +90,17 @@ export const Hero = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="max-w-xl mx-auto text-lg md:text-xl text-slate-600 mb-10 leading-relaxed"
         >
-          Speak naturally, get polished text instantly. The fastest way to write emails, notes, and messages.
+          ChatGPT voice mode, everywhere. Speak naturally in any app and get polished text, perfect prompts, or professional emails instantly.
         </motion.p>
 
-        {/* CTA Buttons - Mac and iOS Waitlist */}
+        {/* CTA Buttons - Mac Download + Waitlists */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6"
+          className="flex flex-col items-center gap-4 mb-6"
         >
-          {/* Mac Download */}
+          {/* Mac Download - Primary */}
           <Link href="/install">
             <Button
               className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-8 py-6 text-base font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 flex items-center gap-3"
@@ -103,18 +112,34 @@ export const Hero = () => {
             </Button>
           </Link>
 
-          {/* iOS Waitlist - Opens email app with pre-written message */}
-          <a href={mailtoLink}>
-            <Button
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 py-6 text-base font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 flex items-center gap-3"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-              </svg>
-              Get for iPhone
-              <span className="bg-white/20 text-xs px-2 py-0.5 rounded-full">Soon</span>
-            </Button>
-          </a>
+          {/* Waitlist Row - iOS + Windows */}
+          <div className="flex flex-row items-center gap-3">
+            {/* iOS Waitlist */}
+            <a href={iosMailtoLink}>
+              <Button
+                variant="outline"
+                className="rounded-full px-6 py-5 text-sm font-semibold transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 border-2 border-slate-300 hover:border-slate-400 text-slate-700"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                </svg>
+                iOS Waitlist
+              </Button>
+            </a>
+
+            {/* Windows Waitlist */}
+            <a href={windowsMailtoLink}>
+              <Button
+                variant="outline"
+                className="rounded-full px-6 py-5 text-sm font-semibold transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 border-2 border-slate-300 hover:border-slate-400 text-slate-700"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+                </svg>
+                Windows Waitlist
+              </Button>
+            </a>
+          </div>
         </motion.div>
 
         <motion.p
@@ -123,7 +148,7 @@ export const Hero = () => {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="text-slate-500 text-sm"
         >
-          Free to try &bull; macOS 10.15+ &bull; iOS coming soon
+          Free to try &bull; macOS 10.15+ &bull; iOS & Windows coming soon
         </motion.p>
 
         {/* Product Preview Image Placeholder */}

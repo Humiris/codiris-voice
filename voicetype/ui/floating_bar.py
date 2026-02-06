@@ -260,7 +260,7 @@ class WaveformBarView(NSView):
 
             # Mode submenu
             mode_menu = NSMenu.alloc().init()
-            modes = ['Raw', 'Clean', 'Format', 'Email', 'Code', 'Notes', 'Super Prompt']
+            modes = ['Raw', 'Clean', 'Format', 'Email', 'Code', 'Notes', 'Translate', 'Ask Me', 'Super Prompt']
             for mode in modes:
                 # Create action name without spaces
                 action_name = mode.replace(' ', '')
@@ -379,6 +379,12 @@ class WaveformBarView(NSView):
 
     def setModeNotes_(self, sender):
         self._set_mode('Notes')
+
+    def setModeTranslate_(self, sender):
+        self._set_mode('Translate')
+
+    def setModeAskMe_(self, sender):
+        self._set_mode('Ask Me')
 
     def setModeSuperPrompt_(self, sender):
         self._set_mode('Super Prompt')
