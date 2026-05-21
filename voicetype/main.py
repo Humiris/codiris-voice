@@ -150,7 +150,7 @@ class VoiceTypeApp(rumps.App):
 
         self.recorder = AudioRecorder()
         # Get transcription model from config (default to gpt4o)
-        transcription_model = self.config.get("transcription_model", "gpt4o")
+        transcription_model = self.config.get("transcription_model", "local")
         self.transcriber = Transcriber(self.config["api_key"], model=transcription_model)
         self.injector = TextInjector()
         self.enhancer = AIEnhancer(self.config["api_key"])
@@ -379,7 +379,7 @@ class VoiceTypeApp(rumps.App):
 
             # Reload config to get latest model setting
             self.config = load_config()
-            current_model = self.config.get("transcription_model", "gpt4o")
+            current_model = self.config.get("transcription_model", "local")
             self.transcriber.set_model(current_model)
 
             # Set API keys for different providers

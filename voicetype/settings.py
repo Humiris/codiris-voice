@@ -15,6 +15,7 @@ SENSITIVE_KEYS = ['api_key', 'google_client_secret']
 
 DEFAULT_CONFIG = {
     "api_key": "",  # Will be stored securely in keychain
+    "transcription_model": "local",  # local Whisper — no API key required
     "hotkey": "fn",  # Using fn/globe key
     "mode": "Raw",  # Raw, Clean, Format
     "language": "auto",  # auto, or specific language code

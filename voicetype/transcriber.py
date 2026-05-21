@@ -10,27 +10,26 @@ API_TIMEOUT = 180
 MAX_FILE_SIZE = 25 * 1024 * 1024
 
 class Transcriber:
-    # Built-in API keys
-    OPENAI_API_KEY = "sk-proj-VLnNhAD7WuWzgJ3cPBg6T3BlbkFJsvenWYpnydczy45T9ITK"
-    GROQ_API_KEY = "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"
-    DEEPGRAM_API_KEY = "b78e6bfb0b310261686d7ebbbcff4403907a6f48"
-    ASSEMBLYAI_API_KEY = "7e681f165b3b49aea39d293a1fadec75"
-
-    def __init__(self, api_key=None, local=False, model="gpt4o", groq_key=None, deepgram_key=None, assemblyai_key=None):
-        self.api_key = api_key or self.OPENAI_API_KEY
-        self.groq_key = groq_key or self.GROQ_API_KEY
-        self.deepgram_key = deepgram_key or self.DEEPGRAM_API_KEY
-        self.assemblyai_key = assemblyai_key or self.ASSEMBLYAI_API_KEY
+    def __init__(self, api_key=None, local=True, model="local", groq_key=None, deepgram_key=None, assemblyai_key=None):
+        self.api_key = api_key or ""
+        self.groq_key = groq_key or ""
+        self.deepgram_key = deepgram_key or ""
+        self.assemblyai_key = assemblyai_key or ""
         self.local = local
         self.model = model
-        self.client = OpenAI(api_key=self.api_key)
+        self.client = OpenAI(api_key=self.api_key) if self.api_key else None
         self._local_model = None
         self._local_model_name = None
         self._loading_local = False
 
+        # Pre-load local Whisper model in the background so the first
+        # transcription doesn't fail with "still loading".
+        if model == "local":
+            threading.Thread(target=lambda: self._load_local_model("base"), daemon=True).start()
+
     def set_api_key(self, api_key):
-        self.api_key = api_key
-        self.client = OpenAI(api_key=api_key)
+        self.api_key = api_key or ""
+        self.client = OpenAI(api_key=api_key) if api_key else None
 
     def set_groq_key(self, key):
         self.groq_key = key
@@ -140,7 +139,7 @@ class Transcriber:
     def _transcribe_gpt4o(self, file_path, language=None):
         """Transcribe using GPT-4o audio capabilities - best quality"""
         if not self.client:
-            raise Exception("OpenAI API Key not configured")
+            raise Exception("OpenAI API key not configured. Add it in Settings, or switch the transcription model to 'Local Whisper'.")
 
         print(f"Using GPT-4o Audio for transcription...")
 
@@ -192,7 +191,7 @@ class Transcriber:
     def _transcribe_whisper(self, file_path, language=None):
         """Transcribe using OpenAI Whisper API - fast and reliable"""
         if not self.client:
-            raise Exception("OpenAI API Key not configured")
+            raise Exception("OpenAI API key not configured. Add it in Settings, or switch the transcription model to 'Local Whisper'.")
 
         print(f"Using OpenAI Whisper API for transcription...")
 
@@ -213,11 +212,7 @@ class Transcriber:
     def _transcribe_groq(self, file_path, language=None):
         """Transcribe using Groq Whisper API - very fast"""
         if not self.groq_key:
-            # Fall back to OpenAI API key if Groq key not set
-            if self.api_key:
-                print("Groq API key not set, using OpenAI Whisper instead...")
-                return self._transcribe_whisper(file_path, language)
-            raise Exception("Groq API Key not configured")
+            raise Exception("Groq API key not configured. Add it in Settings, or switch the transcription model to 'Local Whisper'.")
 
         print(f"Using Groq Whisper for transcription...")
 
@@ -240,10 +235,7 @@ class Transcriber:
     def _transcribe_deepgram(self, file_path, language=None):
         """Transcribe using Deepgram API - high accuracy"""
         if not self.deepgram_key:
-            if self.api_key:
-                print("Deepgram API key not set, using OpenAI Whisper instead...")
-                return self._transcribe_whisper(file_path, language)
-            raise Exception("Deepgram API Key not configured")
+            raise Exception("Deepgram API key not configured. Add it in Settings, or switch the transcription model to 'Local Whisper'.")
 
         print(f"Using Deepgram for transcription...")
 
@@ -276,10 +268,7 @@ class Transcriber:
     def _transcribe_assemblyai(self, file_path, language=None):
         """Transcribe using AssemblyAI API - great accuracy"""
         if not self.assemblyai_key:
-            if self.api_key:
-                print("AssemblyAI API key not set, using OpenAI Whisper instead...")
-                return self._transcribe_whisper(file_path, language)
-            raise Exception("AssemblyAI API Key not configured")
+            raise Exception("AssemblyAI API key not configured. Add it in Settings, or switch the transcription model to 'Local Whisper'.")
 
         print(f"Using AssemblyAI for transcription...")
 
@@ -332,12 +321,18 @@ class Transcriber:
 
     def _transcribe_local(self, file_path, language=None):
         """Transcribe using local Whisper base model - offline/private"""
+        if self._loading_local:
+            import time
+            # Block up to 5 minutes while the background loader finishes
+            # (first download can be slow on slow connections).
+            for _ in range(300):
+                if not self._loading_local:
+                    break
+                time.sleep(1)
         if not self._local_model or self._local_model_name != "base":
-            if self._loading_local:
-                raise Exception("Local model is still loading. Please wait.")
             self._load_local_model("base")
             if not self._local_model:
-                raise Exception("Local model failed to load. Check dependencies.")
+                raise Exception("Local Whisper model failed to load. Check that 'faster-whisper' is installed.")
 
         print(f"Using Local Whisper (base) for transcription...")
 

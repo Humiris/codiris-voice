@@ -170,16 +170,13 @@ def is_ide_active():
 
 
 class AIEnhancer:
-    # Built-in API key
-    OPENAI_API_KEY = "sk-proj-VLnNhAD7WuWzgJ3cPBg6T3BlbkFJsvenWYpnydczy45T9ITK"
-
     def __init__(self, api_key=None):
-        self.api_key = api_key or self.OPENAI_API_KEY
-        self.client = OpenAI(api_key=self.api_key)
+        self.api_key = api_key or ""
+        self.client = OpenAI(api_key=self.api_key) if self.api_key else None
 
     def set_api_key(self, api_key):
-        self.api_key = api_key or self.OPENAI_API_KEY
-        self.client = OpenAI(api_key=self.api_key)
+        self.api_key = api_key or ""
+        self.client = OpenAI(api_key=self.api_key) if self.api_key else None
 
     def enhance(self, text, mode="Clean", custom_prompt=None):
         if not self.client or mode == "Raw":
